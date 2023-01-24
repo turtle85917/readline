@@ -10,12 +10,21 @@ export default class Readline {
     this.stdin.setEncoding("utf8");
   }
 
-  addInputEvent(listener: (...args: string[]) => void) {
+  addInputListener(listener: (...args: string[]) => void) {
     this.clearScreen();
     this.stdin.addListener("data", (data) => {
       if (this.autoFoucs) this.clearScreen();
-      listener(String(data));
+      listener(String(data).trim());
     });
+
+    return this;
+  }
+
+  addCloseListener(listener: (code: number) => void) {
+    process.on("SIGINT", () => process.exit()); // Ctrl + C
+    process.stdin.on("end", () => process.exit()); // Ctrl + D
+    process.on("exit", listener);
+    return this;
   }
 
   setAutoFocus(value: boolean) {
@@ -28,7 +37,7 @@ export default class Readline {
     readline.clearScreenDown(process.stdout);
   }
 
-  close(listener: () => void) {
-    process.stdin.on("end", () => listener);
+  write(content: string = '\n') {
+    process.stdout.write(content);
   }
 }
