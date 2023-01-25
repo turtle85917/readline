@@ -5,6 +5,7 @@ export default class Readline {
   public rline: readline.Interface;
   private autoFoucs: boolean;
   private prompt?: string;
+  private listener: ((...args: string[]) => void) | undefined;
 
   /**
    * 초기화
@@ -22,24 +23,36 @@ export default class Readline {
    * 
    * @param prompt 배열
    */
-  async processPrompts(...prompt: prompts.PromptObject[]) {
+  async processPrompts(promptObjects: prompts.PromptObject[], callback: (response: prompts.Answers<string>) => void) {
     this.clearScreen();
-    const response = await prompts(prompt);
+    this.rline.close();
+    const response = await prompts(promptObjects);
+    callback(response);
+
+    this.rline = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    this.write('\n');
+    if (this.listener !== undefined) this.addInputListener(this.listener);
+
     return response;
   }
 
   /**
-   * 입력이 완료되었을 때 리스너 호출. prompt 값이 지정되었을 경우 입력을 기다릴 때, `>`를 뒤에 붙인 후 출력을 하고 입력을 기다림.
+   * 입력이 완료되었을 때 리스너 호출.
    * 
    * @param listener 입력이 완료되어 Enter 키를 눌렀을 때 호출
    */
   addInputListener(listener: (...args: string[]) => void) {
-    this.clearScreen();
-    this.printPrompt();
+    this.setPrompt()
+    this.rline.prompt();
+    this.listener = listener;
+
     this.rline.on("line", (data) => {
       if (this.autoFoucs) this.clearScreen();
       listener(String(data).trim());
-      this.printPrompt();
+      this.rline.prompt();
     });
 
     return this;
@@ -71,16 +84,18 @@ export default class Readline {
   }
 
   /**
-   * 사용자의 입력을 기다릴 때 출력될 prompt를 지정. *`>`는 자동으로 붙여줌.*
+   * 사용자의 입력을 기다릴 때 출력될 prompt를 지정.
    * 
    * @param value prompt 값
    */
-  setPrompt(value: string) {
-    this.prompt = value;
-  }
-
-  private printPrompt() {
-    if (this.prompt !== undefined) this.write(`${this.prompt}> `);
+  setPrompt(value?: string) {
+    if (value !== undefined) {
+      this.clearScreen();
+      this.prompt = value;
+      this.rline.setPrompt(value);
+    } else if (this.rline.getPrompt() !== this.prompt && this.prompt !== undefined) {
+      this.rline.setPrompt(this.prompt);
+    }
   }
 
   /**
