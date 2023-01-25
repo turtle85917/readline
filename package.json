@@ -1,7 +1,6 @@
 {
   "name": "@turtle85917/readline",
   "version": "1.0.0",
-  "private": true,
   "description": "The first module I made for writing.",
   "main": "dist/index.js",
   "scripts": {
@@ -17,6 +16,8 @@
   "license": "MIT",
   "homepage": "https://github.com/turtle85917/readline#readme",
   "dependencies": {
-    "@types/node": "^18.11.18"
+    "@types/node": "^18.11.18",
+    "@types/prompts": "^2.4.2",
+    "prompts": "^2.4.2"
   }
 }
