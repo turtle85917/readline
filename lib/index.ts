@@ -44,12 +44,13 @@ export default class Readline {
    * 
    * @param prompt 배열
    */
-  async processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>) => void) {
+  async processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>, objects: prompts.PromptObject<T>) => void) {
+    this.rline.close();
     this.processing = true
     this.clearScreen();
-    this.rline.close();
-    const response = await prompts<T>(promptObjects.map(prompt => prompt.toJSON()) as any as prompts.PromptObject<T>);
-    callback(response);
+    const json: prompts.PromptObject<T> = promptObjects.map(prompt => prompt.toJSON()) as any;
+    const response = await prompts<T>(json);
+    callback(response, json);
 
     if (this.listener !== undefined) {
       this.rline = readline.createInterface({
@@ -76,10 +77,9 @@ export default class Readline {
 
     this.rline.prompt();
     this.rline.on("line", (data) => {
-      if (this.processing) return;
-      if (this.autoFoucs) this.clearScreen();
+      this.clearScreen(this.autoFoucs);
       listener(String(data).trim());
-      this.rline.prompt();
+      if (!this.processing) this.rline.prompt();
     });
 
     return this;
@@ -128,7 +128,8 @@ export default class Readline {
   /**
    * 터미널의 스크롤을 터미널의 최근 출력된 값에 맞춰 조정.
    */
-  clearScreen() {
+  clearScreen(value: boolean = true) {
+    if (value !== undefined && !value) return;
     console.log('\n'.repeat(Math.max(process.stdout.rows-2, 0)));
     readline.cursorTo(process.stdout, 0, 0);
     readline.clearScreenDown(process.stdout);

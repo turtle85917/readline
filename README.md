@@ -11,5 +11,3 @@
 
 # P.S.
 It is a module for the **author's personal study** and is not recommended for use because it was developed to suit *my coding style*. 😉
-
-## Thank you!
