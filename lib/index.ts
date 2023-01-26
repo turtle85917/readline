@@ -1,11 +1,13 @@
 import * as prompts from "prompts";
 import * as readline from "node:readline";
+import PromptBuilder from "./PromptBuilder";
 
 export default class Readline {
+  public prompt?: string;
   public rline: readline.Interface;
   private autoFoucs: boolean;
-  private prompt?: string;
   private listener: ((...args: string[]) => void) | undefined;
+  private processing: boolean;
 
   /**
    * 초기화
@@ -16,6 +18,25 @@ export default class Readline {
       output: process.stdout
     });
     this.autoFoucs = false;
+    this.processing = false;
+
+    readline.emitKeypressEvents(process.stdin, this.rline);
+    if (process.stdin.isTTY) process.stdin.setRawMode(true);
+    process.stdin.on("keypress", (str, key: Key) => {
+      let action = '';
+
+      if (key.ctrl) {
+        if (key.name === 'c') process.exit();
+        if (key.name === 'd') process.exit();
+      }
+
+      if (key.name === "return") action = "submit" // Enter
+      if (key.name === "enter") action = "submit"; // Ctrl + J
+      if (key.name === "abort") process.exit();
+      if (["up", "down", "left", "right"].some(k => key.name === k)) action = key.name;
+
+      this.rline.emit("action", action || key.name);
+    });
   }
 
   /**
@@ -23,20 +44,24 @@ export default class Readline {
    * 
    * @param prompt 배열
    */
-  async processPrompts(promptObjects: prompts.PromptObject[], callback: (response: prompts.Answers<string>) => void) {
+  async processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>) => void) {
+    this.processing = true
     this.clearScreen();
     this.rline.close();
-    const response = await prompts(promptObjects);
+    const response = await prompts<T>(promptObjects.map(prompt => prompt.toJSON()) as any as prompts.PromptObject<T>);
     callback(response);
 
-    this.rline = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    this.write('\n');
-    if (this.listener !== undefined) this.addInputListener(this.listener);
+    if (this.listener !== undefined) {
+      this.rline = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      });
+      this.write('\n');
+      this.processing = false;
+      this.addInputListener(this.listener);
+    }
 
-    return response;
+    return response as T;
   }
 
   /**
@@ -45,11 +70,13 @@ export default class Readline {
    * @param listener 입력이 완료되어 Enter 키를 눌렀을 때 호출
    */
   addInputListener(listener: (...args: string[]) => void) {
-    this.setPrompt()
-    this.rline.prompt();
+    this.setPrompt();
     this.listener = listener;
+    if (this.processing) return this;
 
+    this.rline.prompt();
     this.rline.on("line", (data) => {
+      if (this.processing) return;
       if (this.autoFoucs) this.clearScreen();
       listener(String(data).trim());
       this.rline.prompt();
@@ -64,8 +91,8 @@ export default class Readline {
    * @param listener 프로세스가 죽었을 때 호출.
    */
   addCloseListener(listener: (code: number) => void) {
-    process.on("SIGINT", process.exit); // Ctrl + C
-    process.on("SIGQUIT", process.exit); // Ctrl + D
+    process.on("SIGINT", process.exit);
+    process.on("SIGQUIT", process.exit);
     process.on("SIGBREAK", process.exit);
     process.stdin.on("end", process.exit);
     process.on("exit", (code) => {
@@ -91,7 +118,7 @@ export default class Readline {
   setPrompt(value?: string) {
     if (value !== undefined) {
       this.clearScreen();
-      this.prompt = value;
+      this.prompt = `${value} `;
       this.rline.setPrompt(value);
     } else if (this.rline.getPrompt() !== this.prompt && this.prompt !== undefined) {
       this.rline.setPrompt(this.prompt);
@@ -113,4 +140,13 @@ export default class Readline {
   write(content: string = '\n') {
     process.stdout.write(content);
   }
+}
+
+interface Key {
+  sequence: string;
+  name: string;
+  ctrl: boolean;
+  meta: boolean;
+  shift: boolean;
+  code: string;
 }
