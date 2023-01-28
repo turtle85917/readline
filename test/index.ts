@@ -1,5 +1,5 @@
-import Readline from "../lib";
-import PromptBuilder from "../lib/promptBuilder";
+import Readline from "../src";
+import PromptBuilder from "../src/promptBuilder";
 
 let money = 3500;
 let inventory: Inventory[] = [];
