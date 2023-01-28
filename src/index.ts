@@ -1,6 +1,6 @@
 import * as prompts from "prompts";
 import * as readline from "node:readline";
-import PromptBuilder from "./PromptBuilder";
+import PromptBuilder from "./promptBuilder";
 
 export default class Readline {
   public prompt?: string;
@@ -22,7 +22,7 @@ export default class Readline {
 
     readline.emitKeypressEvents(process.stdin, this.rline);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
-    process.stdin.on("keypress", (str, key: Key) => {
+    process.stdin.on("keypress", (_, key: Key) => {
       let action = '';
 
       if (key.ctrl) {
@@ -46,10 +46,11 @@ export default class Readline {
    */
   async processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>, objects: prompts.PromptObject<T>) => void) {
     this.rline.close();
-    this.processing = true
+    this.processing = true;
     this.clearScreen();
     const json: prompts.PromptObject<T> = promptObjects.map(prompt => prompt.toJSON()) as any;
     const response = await prompts<T>(json);
+
     callback(response, json);
 
     if (this.listener !== undefined) {
@@ -57,7 +58,7 @@ export default class Readline {
         input: process.stdin,
         output: process.stdout
       });
-      this.write('\n');
+      this.write();
       this.processing = false;
       this.addInputListener(this.listener);
     }

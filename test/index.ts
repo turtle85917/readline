@@ -1,5 +1,5 @@
 import Readline from "../lib";
-import PromptBuilder from "../lib/PromptBuilder";
+import PromptBuilder from "../lib/promptBuilder";
 
 let money = 3500;
 let inventory: Inventory[] = [];
@@ -40,6 +40,7 @@ readline.addInputListener((data) => {
           selected: shopItem.value === "apple" && shopItem.appleLike,
         })))
     ], (value) => {
+      if (value.shop === undefined) return;
       let price = (value.shop as string[])
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
@@ -50,7 +51,7 @@ readline.addInputListener((data) => {
         const plusAnsi = ansiFrame("+)", TextStyle.F_BLUE);
         value.shop.forEach((item: string) => {
           inventoryNewItem(item);
-          console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item).quantity}!)`);
+          console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });
         readline.write(`└ ${plusAnsi} You have ${money}won left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
       }
@@ -58,9 +59,9 @@ readline.addInputListener((data) => {
   }
   if (data === "inventory") {
     readline.write(ansiFrame("In your current bag...", TextStyle.DIM));
-    console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${money.toLocaleString()}won`);
+    console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${money.toLocaleString()}won.`);
     inventory.forEach(item => {
-      const currentItem = findItem(item.staticId);
+      const currentItem = findItem(item.staticId)!;
       console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
     });
   }
@@ -73,7 +74,7 @@ export const ansiFrame = (value: string, ...styles: number[]) => {
 
 const inventoryNewItem = (item: string) => {
   if (inventoryFindItem(item) === undefined) inventory.push({ staticId: item, quantity: 0 });
-  inventory.find(i => i.staticId === item).quantity++;
+  inventory.find(i => i.staticId === item)!.quantity++;
 }
 
 const inventoryFindItem = (item: string) => inventory.find(i => i.staticId === item);

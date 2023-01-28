@@ -2,8 +2,6 @@ import * as prompts from "prompts";
 
 /**
  * 자주 쓰이는 값만 있습니다.
- * 
- * TODO:
  */
 export default class PromptBuilder {
   row: prompts.PromptObject;
