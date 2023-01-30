@@ -1,12 +1,12 @@
 {
-  "name": "@turtle85917/readline",
+  "name": "funny-terminal",
   "version": "1.0.0",
   "description": "The first module I made for writing.",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "npx ts-node test",
-    "build": "tsc --build",
-    "docs": "typedoc --tsconfig tsconfig.doc.json"
+    "build": "tsc"
   },
   "repository": {
     "type": "git",

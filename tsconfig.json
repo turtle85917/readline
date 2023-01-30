@@ -4,6 +4,7 @@
     "target": "es2022",
     "outDir": "lib",
     "noImplicitAny": true,
+    "declaration": true,
     "sourceMap": true,
     "noEmitOnError": true,
     "removeComments": false,

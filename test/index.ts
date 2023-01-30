@@ -1,5 +1,5 @@
-import Readline from "../src";
-import PromptBuilder from "../src/promptBuilder";
+import Readline from "../lib";
+import PromptBuilder from "../lib/promptBuilder";
 
 let money = 3500;
 let inventory: Inventory[] = [];
@@ -33,7 +33,7 @@ readline.addInputListener((data) => {
         .setType("multiselect")
         .setName("shop")
         .setMessage(`What will you buy? [money: ${money}]`)
-        .setChoices(shopItems.filter(sitem => sitem.value === "apple" ? appleLike : true).map(shopItem => ({
+        .setChoices(shopItems.filter(({ value }) => value !== "apple" || appleLike).map(shopItem => ({
           title: `${shopItem.icon} ${shopItem.name}`,
           value: shopItem.value,
           description: `${shopItem.price}won`,
@@ -45,7 +45,7 @@ readline.addInputListener((data) => {
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
         .reduce((prev, curr) => prev + curr, 0);
-      if (money < price) readline.write(`You don't have enough money...\n→ ${price} - ${ansiFrame(`your: ${money}`, TextStyle.F_MAGENTA)} = ${ansiFrame(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
+      if (money < price) process.stdout.write(`You don't have enough money...\n→ ${price} - ${ansiFrame(`your: ${money}`, TextStyle.F_MAGENTA)} = ${ansiFrame(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
       else {
         money -= price;
         const plusAnsi = ansiFrame("+)", TextStyle.F_BLUE);
@@ -53,12 +53,12 @@ readline.addInputListener((data) => {
           inventoryNewItem(item);
           console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });
-        readline.write(`└ ${plusAnsi} You have ${money}won left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
+        process.stdout.write(`└ ${plusAnsi} You have ${money}won left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
       }
     });
   }
   if (data === "inventory") {
-    readline.write(ansiFrame("In your current bag...", TextStyle.DIM));
+    process.stdout.write(ansiFrame("In your current bag...", TextStyle.DIM));
     console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${money.toLocaleString()}won.`);
     inventory.forEach(item => {
       const currentItem = findItem(item.staticId)!;

@@ -58,7 +58,7 @@ export default class Readline {
         input: process.stdin,
         output: process.stdout
       });
-      this.write();
+      process.stdout.write('\n');
       this.processing = false;
       this.addInputListener(this.listener);
     }
@@ -134,13 +134,6 @@ export default class Readline {
     console.log('\n'.repeat(Math.max(process.stdout.rows-2, 0)));
     readline.cursorTo(process.stdout, 0, 0);
     readline.clearScreenDown(process.stdout);
-  }
-
-  /**
-   * `console.log`를 대신할 메소드.
-   */
-  write(content: string = '\n') {
-    process.stdout.write(content);
   }
 }
 
