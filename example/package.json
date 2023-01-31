@@ -11,6 +11,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "funny-terminal": "^1.0.0"
+    "funny-terminal": "^1.1.0"
   }
 }
