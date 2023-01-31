@@ -6,10 +6,10 @@
 
 # Example
 ```js
-import Fterminal from "funny-terminal";
+import FunnyTerminal from "funny-terminal";
 
-const readline = new Fterminal();
-readline.processPrompts<"anything">([
+const readline = new FunnyTerminal();
+readline.processPrompts<"anything", { anything: string; }>([
   new PromptBuilder()
     .setType("text")
     .setName("anything") // Use the same as the generic name
@@ -24,9 +24,11 @@ readline.processPrompts<"anything">([
 Read the documentation of [prompts package](https://npmjs.com/package/prompts) for more details.
 ** **
 ```js
-import Fterminal from "funny-terminal";
+import FunnyTerminal from "funny-terminal";
 
-const readline = new Fterminal();
+const readline = new FunnyTerminal();
+readline.setPrompt("Input>");
+readline.setAutoFocus(true); //  Automatically scrolls the screen.
 readline.addInputListener((data) => {
   if (data === "quit") process.exit();
   console.log(`Recived : ${data}`);
@@ -42,4 +44,4 @@ readline.addInputListener((data) => {
 |[prompts](https://npmjs.com/package/prompts)  MIT|[Terkel](https://github.com/terkelg)|
 
 # P.S.
-It is a module for the **author's personal study** and is not recommended for use because it was developed to suit *my coding style*. 😉
+It is a module for the **author's personal study** and is not recommended for use because it was developed to suit *author's coding style*. 😉

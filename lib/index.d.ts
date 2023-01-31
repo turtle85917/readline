@@ -17,13 +17,13 @@ export default class Readline {
      *
      * @param prompt 배열
      */
-    processPrompts<T extends string, U extends Record<T, any | undefined>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void): Promise<U>;
+    processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void): Promise<U>;
     /**
      * 입력이 완료되었을 때 리스너 호출.
      *
      * @param listener 입력이 완료되어 Enter 키를 눌렀을 때 호출
      */
-    addInputListener(listener: (...args: string[]) => void): this;
+    addInputListener(listener: (data: string) => void): this;
     /**
      * 프로세스가 죽었을 때 리스너 호출. `Ctrl + C` / `Ctrl + D`(*지원 안되는 경우, 무시됨*)을 눌렀을 때 프로세스 종료.
      *
@@ -45,5 +45,5 @@ export default class Readline {
     /**
      * 터미널의 스크롤을 터미널의 최근 출력된 값에 맞춰 조정.
      */
-    clearScreen(value?: boolean): void;
+    private clearScreen;
 }

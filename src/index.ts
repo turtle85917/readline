@@ -1,3 +1,11 @@
+/*
+* File: index.ts
+* 
+* Copyright (c) 2022-2022 turtle85917
+* 
+* Licensed under MIT License. Please see more defails in LICENSE file.
+*/
+
 import * as prompts from "prompts";
 import * as readline from "node:readline";
 import PromptBuilder from "./promptBuilder";
@@ -44,7 +52,7 @@ export default class Readline {
    * 
    * @param prompt 배열
    */
-  async processPrompts<T extends string, U extends Record<T, any|undefined>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void) {
+  async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void) {
     this.rline.close();
     this.processing = true;
     this.clearScreen();
@@ -71,7 +79,7 @@ export default class Readline {
    * 
    * @param listener 입력이 완료되어 Enter 키를 눌렀을 때 호출
    */
-  addInputListener(listener: (...args: string[]) => void) {
+  addInputListener(listener: (data: string) => void) {
     this.setPrompt();
     this.listener = listener;
     if (this.processing) return this;
@@ -129,7 +137,7 @@ export default class Readline {
   /**
    * 터미널의 스크롤을 터미널의 최근 출력된 값에 맞춰 조정.
    */
-  clearScreen(value: boolean = true) {
+  private clearScreen(value: boolean = true) {
     if (value !== undefined && !value) return;
     console.log('\n'.repeat(Math.max(process.stdout.rows-2, 0)));
     readline.cursorTo(process.stdout, 0, 0);
