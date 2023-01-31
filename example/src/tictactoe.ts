@@ -20,7 +20,7 @@ readline.addInputListener(input => {
   console.log(boardToString());
   requestExit();
   turn = turn === 'O' ? 'X' : 'O';
-  process.stdout.write(`Now it's player ${turn}'s turn.`);
+  console.log(`Now it's player ${turn}'s turn.`);
 });
 
 const invaildRequest = (reason: boolean, placed: boolean = false) => {
@@ -44,7 +44,7 @@ function checkWin(target: string) {
   const checkCols = (list: string[]) => list.every(item => item === target);
   const checkRows = (list: string[][]) => list.some(items => checkCols(items));
   const filtering = (calc?: (idx: number) => number) => board.map((tiles, idx) => tiles[calc?.(idx) ?? idx]);
-  return checkRows(board) || checkCols(filtering()) || checkCols(filtering(idx => Math.max(2-idx, 0))) || checkRows(board.map((_,y) => board[y].map((_,x) => board[x][y])));
+  return checkRows(board) || checkCols(filtering()) || checkCols(filtering(idx => Math.max(2-idx, 0))) || checkRows(board.slice(0, 3).reduce((p, c) => p.map((a, i) => [...a, c[i]]), Array(3).fill([])));
 }
 
 function checkDraw() {

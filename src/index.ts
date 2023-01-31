@@ -43,7 +43,7 @@ export default class Readline {
       if (key.name === "abort") process.exit();
       if (["up", "down", "left", "right"].some(k => key.name === k)) action = key.name;
 
-      this.rline.emit("action", action || key.name);
+      this.rline.emit("action", { action });
     });
   }
 
