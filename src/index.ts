@@ -44,12 +44,12 @@ export default class Readline {
    * 
    * @param prompt 배열
    */
-  async processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>, objects: prompts.PromptObject<T>) => void) {
+  async processPrompts<T extends string, U extends Record<T, any|undefined>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void) {
     this.rline.close();
     this.processing = true;
     this.clearScreen();
     const json: prompts.PromptObject<T> = promptObjects.map(prompt => prompt.toJSON()) as any;
-    const response = await prompts<T>(json);
+    const response: U = await prompts<T>(json) as any;
 
     callback(response, json);
 
@@ -63,7 +63,7 @@ export default class Readline {
       this.addInputListener(this.listener);
     }
 
-    return response as T;
+    return response;
   }
 
   /**

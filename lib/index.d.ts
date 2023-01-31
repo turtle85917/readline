@@ -17,7 +17,7 @@ export default class Readline {
      *
      * @param prompt 배열
      */
-    processPrompts<T extends string>(promptObjects: PromptBuilder[], callback: (response: prompts.Answers<T>, objects: prompts.PromptObject<T>) => void): Promise<T>;
+    processPrompts<T extends string, U extends Record<T, any | undefined>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void): Promise<U>;
     /**
      * 입력이 완료되었을 때 리스너 호출.
      *

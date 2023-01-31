@@ -15,7 +15,7 @@ const shopItems: ShopItem[] = [
 
 readline.setPrompt("Input>");
 readline.setAutoFocus(true);
-readline.processPrompts([
+readline.processPrompts<"apple"|"reason", { apple: string; reason: string|undefined; }>([
   new PromptBuilder()
     .setType("select")
     .setName("apple")
@@ -23,12 +23,20 @@ readline.processPrompts([
     .setChoices([
       { title: "Yep", value: "yes" },
       { title: "No", value: "no" }
-    ])
-], (response) => appleLike = response.apple === "yes");
+    ]),
+  new PromptBuilder()
+    .setType((value) => value === "no" ? "text" : null) // "value" variable comes in answer to the previous prompt request, "Do you like apple?"
+    .setName("reason")
+    .setMessage("Why?")
+    .setInitial("Reason")
+], (response) => {
+  appleLike = response.apple === "yes";
+  if (!appleLike && response.reason !== undefined) process.stdout.write(`The reason you hate apples is because of "${response.reason}".`);
+});
 readline.addInputListener((data) => {
   if (data === "quit") process.exit();
   if (data === "shop") {
-    readline.processPrompts<"shop">([
+    readline.processPrompts<"shop", { shop: string[] }>([
       new PromptBuilder()
         .setType("multiselect")
         .setName("shop")
@@ -41,6 +49,10 @@ readline.addInputListener((data) => {
         })))
     ], (value) => {
       if (value.shop === undefined) return;
+      if (value.shop.length === 0) {
+        process.stdout.write("Didn't buy anything...");
+        return;
+      }
       let price = (value.shop as string[])
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
@@ -53,16 +65,16 @@ readline.addInputListener((data) => {
           inventoryNewItem(item);
           console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });
-        process.stdout.write(`└ ${plusAnsi} You have ${money}won left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
+        process.stdout.write(`└ ${plusAnsi} You have ${ansiFrame(`${money}won`, TextStyle.BRIGHT)} left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
       }
     });
   }
   if (data === "inventory") {
     process.stdout.write(ansiFrame("In your current bag...", TextStyle.DIM));
-    console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${money.toLocaleString()}won.`);
+    console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} 💰 ${money.toLocaleString()}won.`);
     inventory.forEach(item => {
       const currentItem = findItem(item.staticId)!;
-      console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
+      console.log(`${ansiFrame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
     });
   }
 });

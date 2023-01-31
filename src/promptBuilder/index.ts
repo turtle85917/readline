@@ -3,14 +3,14 @@ import * as prompts from "prompts";
 /**
  * 자주 쓰이는 값만 있습니다.
  */
-export default class PromptBuilder {
+export default class PromptBuilder<T extends string> {
   row: prompts.PromptObject;
 
   constructor() {
     this.row = { type: null, name: '' };
   }
 
-  setType(value: prompts.PromptType | prompts.Falsy |  prompts.PrevCaller<string, prompts.PromptType | prompts.Falsy>) {
+  setType(value: prompts.PromptType | prompts.Falsy | ((value: T) => (prompts.PromptType | prompts.Falsy))) {
     this.row.type = value;
     return this;
   }

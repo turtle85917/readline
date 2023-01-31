@@ -2,10 +2,10 @@ import * as prompts from "prompts";
 /**
  * 자주 쓰이는 값만 있습니다.
  */
-export default class PromptBuilder {
+export default class PromptBuilder<T extends string> {
     row: prompts.PromptObject;
     constructor();
-    setType(value: prompts.PromptType | prompts.Falsy | prompts.PrevCaller<string, prompts.PromptType | prompts.Falsy>): this;
+    setType(value: prompts.PromptType | prompts.Falsy | ((value: T) => (prompts.PromptType | prompts.Falsy))): this;
     setName(value: string): this;
     setMessage(value: prompts.ValueOrFunc<string>): this;
     setInitial(value: prompts.InitialReturnValue | prompts.PrevCaller<string, prompts.InitialReturnValue | Promise<prompts.InitialReturnValue>>): this;
