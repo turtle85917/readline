@@ -1,9 +1,12 @@
 import * as prompts from "prompts";
 /**
- * 자주 쓰이는 값만 있습니다.
+ * Create a prompt builder.
  */
 export default class PromptBuilder<T extends string> {
     row: prompts.PromptObject;
+    /**
+     * Initialization.
+     */
     constructor();
     setType(value: prompts.PromptType | prompts.Falsy | ((value: T) => (prompts.PromptType | prompts.Falsy))): this;
     setName(value: string): this;

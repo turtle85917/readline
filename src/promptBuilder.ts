@@ -9,11 +9,14 @@
 import * as prompts from "prompts";
 
 /**
- * 자주 쓰이는 값만 있습니다.
+ * Create a prompt builder.
  */
 export default class PromptBuilder<T extends string> {
   row: prompts.PromptObject;
 
+  /**
+   * Initialization.
+   */
   constructor() {
     this.row = { type: null, name: '' };
   }

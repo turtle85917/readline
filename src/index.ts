@@ -14,11 +14,11 @@ export default class Readline {
   public prompt?: string;
   public rline: readline.Interface;
   private autoFoucs: boolean;
-  private listener: ((...args: string[]) => void) | undefined;
+  private listeners: Record<"input"|"action", (data: string) => void|undefined>;
   private processing: boolean;
 
   /**
-   * 초기화
+   * Initialization.
    */
   constructor() {
     this.rline = readline.createInterface({
@@ -27,6 +27,7 @@ export default class Readline {
     });
     this.autoFoucs = false;
     this.processing = false;
+    this.listeners = { input: undefined, action: undefined };
 
     readline.emitKeypressEvents(process.stdin, this.rline);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
@@ -43,14 +44,14 @@ export default class Readline {
       if (key.name === "abort") process.exit();
       if (["up", "down", "left", "right"].some(k => key.name === k)) action = key.name;
 
-      this.rline.emit("action", { action });
+      this.rline.emit("action", action);
     });
   }
 
   /**
-   * 사용자와의 상호작용을 사용하기 위함.
+   * To enable interaction with users.
    * 
-   * @param prompt 배열
+   * @param prompt prompt array.
    */
   async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void) {
     this.rline.close();
@@ -61,27 +62,28 @@ export default class Readline {
 
     callback(response, json);
 
-    if (this.listener !== undefined) {
+    if (this.listeners.input !== undefined) {
       this.rline = readline.createInterface({
         input: process.stdin,
         output: process.stdout
       });
       process.stdout.write('\n');
       this.processing = false;
-      this.addInputListener(this.listener);
+      this.addInputListener(this.listeners.input);
+      this.addActionListener(this.listeners.action);
     }
 
     return response;
   }
 
   /**
-   * 입력이 완료되었을 때 리스너 호출.
+   * Call the listener when input is complete.
    * 
-   * @param listener 입력이 완료되어 Enter 키를 눌렀을 때 호출
+   * @param listener Listener to invoke.
    */
   addInputListener(listener: (data: string) => void) {
     this.setPrompt();
-    this.listener = listener;
+    this.listeners.input = listener;
     if (this.processing) return this;
 
     this.rline.prompt();
@@ -95,9 +97,20 @@ export default class Readline {
   }
 
   /**
-   * 프로세스가 죽었을 때 리스너 호출. `Ctrl + C` / `Ctrl + D`(*지원 안되는 경우, 무시됨*)을 눌렀을 때 프로세스 종료.
+   * Call the listener when a key on keyboard is pressed.
    * 
-   * @param listener 프로세스가 죽었을 때 호출.
+   * @param listener Listener to invoke.
+   */
+  addActionListener(listener: (data: string) => void) {
+    this.listeners.action = listener;
+    this.rline.addListener("action", listener);
+    return this;
+  }
+
+  /**
+   * Call the listener when the process exits.
+   * 
+   * @param listener Listener to invoke.
    */
   addCloseListener(listener: (code: number) => void) {
     process.on("SIGINT", process.exit);
@@ -111,18 +124,18 @@ export default class Readline {
   }
 
   /**
-   * 사용자의 입력이 완료되었을 때 자동 스크롤을 내릴지 여부 값을 지정.
+   * Specifies whether to automatically scroll down after user input is complete.
    * 
-   * @param value 자동 스크롤 여부 값
+   * @param value Value.
    */
   setAutoFocus(value: boolean) {
     this.autoFoucs = value;
   }
 
   /**
-   * 사용자의 입력을 기다릴 때 출력될 prompt를 지정.
+   * Set prompt.
    * 
-   * @param value prompt 값
+   * @param value Value.
    */
   setPrompt(value?: string) {
     if (value !== undefined) {
@@ -135,7 +148,7 @@ export default class Readline {
   }
 
   /**
-   * 터미널의 스크롤을 터미널의 최근 출력된 값에 맞춰 조정.
+   * Adjusts the scrolling of the terminal to match the terminal's last output value.
    */
   private clearScreen(value: boolean = true) {
     if (value !== undefined && !value) return;
