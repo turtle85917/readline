@@ -17,7 +17,9 @@ export default class Readline {
      *
      * @param prompt prompt array.
      */
-    processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void): Promise<U>;
+    processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void | Promise<void>): Promise<U>;
+    private eventInitial;
+    private eventProcessing;
     /**
      * Call the listener when input is complete.
      *
@@ -29,7 +31,7 @@ export default class Readline {
      *
      * @param listener Listener to invoke.
      */
-    addActionListener(listener: (data: string) => void): this;
+    addActionListener(listener: (data: ActionData) => void): this;
     /**
      * Call the listener when the process exits.
      *
@@ -47,9 +49,22 @@ export default class Readline {
      *
      * @param value Value.
      */
-    setPrompt(value?: string): void;
+    setPrompt(value: string): void;
     /**
      * Adjusts the scrolling of the terminal to match the terminal's last output value.
      */
     private clearScreen;
 }
+interface ActionData {
+    name: string;
+    key: Key;
+}
+interface Key {
+    sequence: string;
+    name: string;
+    ctrl: boolean;
+    meta: boolean;
+    shift: boolean;
+    code: string;
+}
+export {};

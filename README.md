@@ -28,7 +28,7 @@ import FunnyTerminal from "funny-terminal";
 
 const readline = new FunnyTerminal();
 readline.setPrompt("Input>");
-readline.setAutoFocus(true); //  Automatically scrolls the screen.
+readline.setAutoFocus(true); //  Automatically scrolls the screen. Default value is `true`.
 readline.addInputListener((data) => {
   if (data === "quit") process.exit();
   console.log(`Recived : ${data}`);

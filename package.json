@@ -6,6 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "npx ts-node test",
+    "test:second": "npx ts-node test/second",
     "build": "tsc"
   },
   "repository": {

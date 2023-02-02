@@ -14,7 +14,7 @@ export default class Readline {
   public prompt?: string;
   public rline: readline.Interface;
   private autoFoucs: boolean;
-  private listeners: Record<"input"|"action", (data: string) => void|undefined>;
+  private listeners: Record<ListenerName, (data: string|ActionData) => void|undefined>;
   private processing: boolean;
 
   /**
@@ -25,7 +25,7 @@ export default class Readline {
       input: process.stdin,
       output: process.stdout
     });
-    this.autoFoucs = false;
+    this.autoFoucs = true;
     this.processing = false;
     this.listeners = { input: undefined, action: undefined };
 
@@ -44,7 +44,7 @@ export default class Readline {
       if (key.name === "abort") process.exit();
       if (["up", "down", "left", "right"].some(k => key.name === k)) action = key.name;
 
-      this.rline.emit("action", action);
+      if (action !== '') this.rline.emit("action", { name: action, key } as ActionData);
     });
   }
 
@@ -53,7 +53,7 @@ export default class Readline {
    * 
    * @param prompt prompt array.
    */
-  async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void) {
+  async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void|Promise<void>) {
     this.rline.close();
     this.processing = true;
     this.clearScreen();
@@ -62,18 +62,43 @@ export default class Readline {
 
     callback(response, json);
 
-    if (this.listeners.input !== undefined) {
+    if (Object.values(this.listeners).some(item => item !== undefined)) {
       this.rline = readline.createInterface({
         input: process.stdin,
         output: process.stdout
       });
+      this.setPrompt(this.prompt);
       process.stdout.write('\n');
       this.processing = false;
-      this.addInputListener(this.listeners.input);
-      this.addActionListener(this.listeners.action);
+      if (this.listeners.input !== undefined) this.addInputListener(this.listeners.input);
+      if (this.listeners.action !== undefined) this.addActionListener(this.listeners.action);
     }
 
     return response;
+  }
+
+  private eventInitial() {
+    if (this.processing) return true;
+    this.clearScreen();
+    if (this.prompt) this.rline.prompt();
+    this.rline.emit("ready");
+    return false;
+  }
+
+  private eventProcessing(name: ListenerName, data: string | ActionData) {
+    this.clearScreen(this.autoFoucs);
+    this.listeners[name](data);
+    if (!this.processing && this.prompt) this.rline.prompt();
+  }
+
+  /**
+   * Call the listener when setup finished.
+   * 
+   * @param listener Listener to invoke.
+   */
+  addReadyListener(listener: () => void) {
+    this.rline.addListener("ready", listener);
+    return this;
   }
 
   /**
@@ -82,17 +107,11 @@ export default class Readline {
    * @param listener Listener to invoke.
    */
   addInputListener(listener: (data: string) => void) {
-    this.setPrompt();
+    const req = this.eventInitial();
     this.listeners.input = listener;
-    if (this.processing) return this;
+    if (req) return this;
 
-    this.rline.prompt();
-    this.rline.on("line", (data) => {
-      this.clearScreen(this.autoFoucs);
-      listener(String(data).trim());
-      if (!this.processing) this.rline.prompt();
-    });
-
+    this.rline.on("line", (data) => this.eventProcessing("input", String(data).trim()));
     return this;
   }
 
@@ -101,9 +120,12 @@ export default class Readline {
    * 
    * @param listener Listener to invoke.
    */
-  addActionListener(listener: (data: string) => void) {
+  addActionListener(listener: (data: ActionData) => void) {
+    const req = this.eventInitial();
     this.listeners.action = listener;
-    this.rline.addListener("action", listener);
+    if (req) return this;
+
+    this.rline.addListener("action", (data) => this.eventProcessing("action", data));
     return this;
   }
 
@@ -137,14 +159,9 @@ export default class Readline {
    * 
    * @param value Value.
    */
-  setPrompt(value?: string) {
-    if (value !== undefined) {
-      this.clearScreen();
-      this.prompt = `${value} `;
-      this.rline.setPrompt(value);
-    } else if (this.rline.getPrompt() !== this.prompt && this.prompt !== undefined) {
-      this.rline.setPrompt(this.prompt);
-    }
+  setPrompt(value: string) {
+    this.rline.setPrompt(value + (value.endsWith(' ') ? '' : ' '));
+    this.prompt = this.rline.getPrompt();
   }
 
   /**
@@ -156,6 +173,13 @@ export default class Readline {
     readline.cursorTo(process.stdout, 0, 0);
     readline.clearScreenDown(process.stdout);
   }
+}
+
+type ListenerName = "input" | "action";
+
+interface ActionData {
+  name: string;
+  key: Key;
 }
 
 interface Key {

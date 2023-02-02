@@ -1,9 +1,12 @@
-import Readline from "../lib";
+import Readline from "../src";
 import PromptBuilder from "../lib/promptBuilder";
+import { TextStyle } from "./enum/TextStyle";
+import { ansiFrame } from "./utils/ansiFrame";
 
 let money = 3500;
 let inventory: Inventory[] = [];
 let appleLike = false;
+
 const readline = new Readline();
 const shopItems: ShopItem[] = [
   { icon: "🍎", name: "Apple", value: "apple", price: 500, appleLike: true },
@@ -14,7 +17,6 @@ const shopItems: ShopItem[] = [
 ];
 
 readline.setPrompt("Input>");
-readline.setAutoFocus(true);
 readline.processPrompts<"apple"|"reason", { apple: string; reason: string|undefined; }>([
   new PromptBuilder()
     .setType("select")
@@ -80,10 +82,6 @@ readline.addInputListener((data) => {
 });
 readline.addCloseListener(() => console.log("\nEnd readline."));
 
-export const ansiFrame = (value: string, ...styles: number[]) => {
-  return `\x1b[${styles.join(';')}m${value}\x1b[0m`;
-}
-
 const inventoryNewItem = (item: string) => {
   if (inventoryFindItem(item) === undefined) inventory.push({ staticId: item, quantity: 0 });
   inventory.find(i => i.staticId === item)!.quantity++;
@@ -103,29 +101,4 @@ interface ShopItem {
 interface Inventory {
   staticId: string;
   quantity: number;
-}
-
-export enum TextStyle {
-  NORMAL,
-  BRIGHT,
-  DIM,
-  UNDERSCORE = 4,
-
-  F_BLACK = 30,
-  F_RED,
-  F_GREEN,
-  F_YELLOW,
-  F_BLUE,
-  F_MAGENTA,
-  F_CYAN,
-  F_WHITE,
-
-  B_BLACK = 40,
-  B_RED,
-  B_GREEN,
-  B_YELLOW,
-  B_BLUE,
-  B_MAGENTA,
-  B_CYAN,
-  B_WHITE
 }
