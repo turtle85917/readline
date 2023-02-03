@@ -4,6 +4,8 @@
   <b>Developed for convenience when working with terminals.</b>
 </p>
 
+> Umm... In fact, this module is a project started to make the author comfortable when making games.
+
 # Examples
 ```js
 import FunnyTerminal from "funny-terminal";
@@ -39,6 +41,18 @@ readline.addInputListener((data) => {
 ```
 
 *Stop typing when the processPrompt is invoked.*
+
+# Testcases
+In **test/index.ts**...
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%231.gif">
+
+In **test/second.ts**...
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
+
+> The reason it blinks is because a new message is uploaded. This will be fixed later.
+
+In **example/tictactoe.ts**...
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
 
 # API
 *(preparing...)*
