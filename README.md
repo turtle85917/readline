@@ -36,7 +36,7 @@ readline.addInputListener((data) => {
   .addCloseListener(() => console.log("Quit."));
 ```
 
-***Stop typing*** if prcessPrompts is called.
+*Stop typing when the processPrompt is invoked.*
 
 # Packages used
 |Name              |Author            |
