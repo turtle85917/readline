@@ -4,7 +4,7 @@
   <b>Developed for convenience when working with terminals.</b>
 </p>
 
-# Example
+# Examples
 ```js
 import FunnyTerminal from "funny-terminal";
 
@@ -37,6 +37,36 @@ readline.addInputListener((data) => {
 ```
 
 *Stop typing when the processPrompt is invoked.*
+
+# API
+<h1>Constructors</h1>
+
+<h3>constructor</h3>
+
+> Initialization.
+
+<h1>Properties</h1>
+
+<h3><code style="font-size:10pt;">Optional</code> prompt?: <i>string</i></h3>
+<h3>rline: <i>readline.Interface</i></h3>
+
+<h1>Methods</h1>
+
+<h3>addCloseListener</h3>
+
+<span style="border: 1px solid">addCloseListener(listener: ((code: <i>number</i>) => <i>void</i>)): <i>void</i></span>
+
+> To enable interaction with users.
+<h4>Parameters</h4>
+
+- listener: ((code: <i>number</i>) => <i>void</i>)
+- > prompt array.
+- <h4>Parameters</h4>
+- - (code: <i>number</i>) => <i>void</i>
+- - <h4>Parameters</h4>
+- - - code: <i>number</i>
+- - <h4>Returns <i>void</i></h4>
+- <h4>Returns <i>void</i></h4>
 
 # Packages used
 |Name              |Author            |
