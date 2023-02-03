@@ -1,4 +1,4 @@
-import Readline from "../src";
+import Readline from "../lib";
 import PromptBuilder from "../lib/promptBuilder";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";

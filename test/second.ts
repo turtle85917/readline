@@ -1,14 +1,14 @@
-// This test case is for pressing with keyboard keys.
+// This testcase is for pressing with keyboard keys.
 
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline from "../src";
+import Readline from "../lib";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
 
 const WIDTH = 10;
-const HEIGHT = 5;
+const HEIGHT = 6;
 const blocks = ["░░", "██"];
 let board = new Array(WIDTH * HEIGHT).fill(0);
 
@@ -16,24 +16,112 @@ let player = { block: ansiFrame("██", TextStyle.F_YELLOW), x: 1, y: 1 };
 let status: Status = {
   block: ansiFrame("██", TextStyle.F_MAGENTA),
   goal: (g) => ansiFrame("██", g ? TextStyle.F_GREEN : TextStyle.F_RED),
-  blocks: [{ x: 4, y: 2 }],
-  goals: [{ x: 2, y: 3, g: false }]
+  blocks: [{ x: 4, y: 2 }, { x: 7, y: 3 }],
+  goals: [{ x: 2, y: 5, g: false }, { x: 8, y: 1, g: false }]
 }
+let steps: Step[] = [];
+let lastActions: Step[] = [];
 
 const readline = new Readline();
 readline
-  .addReadyListener(() => {
-    process.stdout.write(getBoard());
-  })
+  .addReadyListener(() => process.stdout.write(getBoard()))
   .addActionListener((data) => {
+    if (data.name === "undo") {
+      let part = steps.slice(-3);
+      if (part.every(step => step.kind === "player-move") && steps.length > 0) part = [part.at(-1)!];
+      processSteps(part);
+      process.stdout.write(getBoard());
+      return;
+    }
+
+    if (data.name === "redo") {
+      processSteps(lastActions, false);
+      lastActions = [];
+      process.stdout.write(getBoard());
+      return;
+    }
+
     let direction: Position = { x: 0, y: 0 };
-    direction.x += data.name === "left" ? -1 : 1;
-    direction.y += data.name === "up" ? -1 : 1;
+    direction.x = data.name === "left" ? -1 : data.name === "right" ? 1 : 0;
+    direction.y = data.name === "up" ? -1 : data.name === "down" ? 1 : 0;
+    if (Object.values(direction).every(item => item === 0)) return;
+
+    lastActions = [];
+    steps.push({ kind: "player-move", x: player.x, y: player.y, index: 0 });
     player.x += direction.x;
     player.y += direction.y;
+
+    status.blocks.forEach((block, index) => {
+      const newblock = status.blocks.filter(item => item.x === block.x+direction.x && item.y === block.y+direction.y);
+      if (block.x === player.x && block.y === player.y && newblock.length === 0) {
+        steps.push({ kind: "box-move", x: block.x, y: block.y, index });
+        block.x += direction.x;
+        block.y += direction.y;
+        const over = overWall(block);
+        if (over.x) {
+          block.x -= direction.x;
+          player.x -= direction.x;
+        }
+        if (over.y) {
+          block.y -= direction.y;
+          player.y -= direction.y;
+        }
+      }
+    });
+
+    if (status.blocks.filter(item => item.x === player.x && item.y === player.y).length > 0) {
+      player.x -= direction.x;
+      player.y -= direction.y;
+    }
+    
+    const over = overWall(player);
+    if (over.x) player.x -= direction.x;
+    if (over.y) player.y -= direction.y;
+
+    status.goals.forEach((goal, index) => {
+      if (steps.at(-1)?.kind === "box-move") steps.push({ kind: "box-goal", x: goal.x, y: goal.y, index, goal: goal.g });
+      goal.g = status.blocks.filter(item => item.x === goal.x && item.y === goal.y).length > 0;
+    });
     process.stdout.write(getBoard());
+
+    if (status.goals.every(item => item.g)) {
+      process.stdout.write("Clear!");
+      process.exit();
+    }
   })
   .addCloseListener(() => console.log("\nEnd readline."));
+
+function overWall(position: Position) {
+  return {
+    x: position.x < 0 || position.x >= WIDTH,
+    y: position.y < 0 || position.y >= HEIGHT
+  };
+}
+
+function processSteps(part: Step[], undo: boolean = true) {
+  const targetArray = undo ? lastActions : steps;
+  for (const step of part) {
+    if (step.kind === "box-move") {
+      const currentBlock = status.blocks[step.index];
+      targetArray.push({ kind: "box-move", x: currentBlock.x, y: currentBlock.y, index: step.index });
+      currentBlock.x = step.x;
+      currentBlock.y = step.y;
+      steps.pop();
+    }
+    if (step.kind === "box-goal") {
+      const currentGoal = status.goals[step.index];
+      targetArray.push({ kind: "box-goal", x: currentGoal.x, y: currentGoal.y, index: step.index });
+      status.goals[step.index].g = step.goal ?? false;
+      steps.pop();
+    }
+    if (step.kind === "player-move") {
+      targetArray.push({ kind: "player-move", x: player.x, y: player.y, index: 0 });
+      player.x = step.x;
+      player.y = step.y;
+      steps.pop();
+    }
+  }
+}
 
 function getBoard() {
   let result: string[] = [];
@@ -51,6 +139,13 @@ function getBoard() {
   }
 
   return result.join('');
+}
+
+interface Step extends Position {
+  kind: "box-move" | "box-goal" | "player-move";
+  goal?: boolean;
+  index: number;
+  start?: boolean;
 }
 
 interface Position {

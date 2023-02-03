@@ -21,6 +21,12 @@ export default class Readline {
     private eventInitial;
     private eventProcessing;
     /**
+     * Call the listener when setup finished.
+     *
+     * @param listener Listener to invoke.
+     */
+    addReadyListener(listener: () => void): this;
+    /**
      * Call the listener when input is complete.
      *
      * @param listener Listener to invoke.

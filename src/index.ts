@@ -37,6 +37,8 @@ export default class Readline {
       if (key.ctrl) {
         if (key.name === 'c') process.exit();
         if (key.name === 'd') process.exit();
+        if (key.name === 'z') action = "undo";
+        if (key.name === 'y') action = "redo";
       }
 
       if (key.name === "return") action = "submit" // Enter
