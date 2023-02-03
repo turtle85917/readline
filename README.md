@@ -44,15 +44,18 @@ readline.addInputListener((data) => {
 
 # Testcases
 In **test/index.ts**...
-<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%231.gif">
+
+> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%231.gif">
 
 In **test/second.ts**...
-<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
+
+> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
 
 > The reason it blinks is because a new message is uploaded. This will be fixed later.
 
 In **example/tictactoe.ts**...
-<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
+
+> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
 
 # API
 *(preparing...)*
