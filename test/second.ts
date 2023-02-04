@@ -3,7 +3,7 @@
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline from "../lib";
+import Readline from "../src";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
 
@@ -24,20 +24,20 @@ let lastActions: Step[] = [];
 
 const readline = new Readline();
 readline
-  .addReadyListener(() => process.stdout.write(getBoard()))
+  .addReadyListener(() => readline.cover(getBoard()))
   .addActionListener((data) => {
     if (data.name === "undo") {
       let part = steps.slice(-3);
       if (part.every(step => step.kind === "player-move") && steps.length > 0) part = [part.at(-1)!];
       processSteps(part);
-      process.stdout.write(getBoard());
+      readline.cover(getBoard());
       return;
     }
 
     if (data.name === "redo") {
       processSteps(lastActions, false);
       lastActions = [];
-      process.stdout.write(getBoard());
+      readline.cover(getBoard());
       return;
     }
 
@@ -82,7 +82,7 @@ readline
       if (steps.at(-1)?.kind === "box-move") steps.push({ kind: "box-goal", x: goal.x, y: goal.y, index, goal: goal.g });
       goal.g = status.blocks.filter(item => item.x === goal.x && item.y === goal.y).length > 0;
     });
-    process.stdout.write(getBoard());
+    readline.cover(getBoard());
 
     if (status.goals.every(item => item.g)) {
       process.stdout.write("Clear!");

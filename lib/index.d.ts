@@ -57,6 +57,12 @@ export default class Readline {
      */
     setPrompt(value: string): void;
     /**
+     * Covers the newly printed message over the previously printed message.
+     *
+     * @param content Value.
+     */
+    cover(content: string): void;
+    /**
      * Adjusts the scrolling of the terminal to match the terminal's last output value.
      */
     private clearScreen;

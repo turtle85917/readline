@@ -71,26 +71,27 @@ export default class Readline {
       });
       this.setPrompt(this.prompt);
       process.stdout.write('\n');
-      this.processing = false;
-      if (this.listeners.input !== undefined) this.addInputListener(this.listeners.input);
+      if (this.listeners.input !== undefined) {
+        if (this.prompt !== undefined) this.rline.prompt();
+        this.addInputListener(this.listeners.input);
+      }
       if (this.listeners.action !== undefined) this.addActionListener(this.listeners.action);
+      this.processing = false;
     }
 
     return response;
   }
 
   private eventInitial() {
-    if (this.processing) return true;
-    this.clearScreen();
-    if (this.prompt) this.rline.prompt();
+    if (!this.processing) this.clearScreen();
     this.rline.emit("ready");
-    return false;
   }
 
   private eventProcessing(name: ListenerName, data: string | ActionData) {
+    if (this.processing) return;
     this.clearScreen(this.autoFoucs);
     this.listeners[name](data);
-    if (!this.processing && this.prompt) this.rline.prompt();
+    if (this.prompt !== undefined && !this.processing) this.rline.prompt();
   }
 
   /**
@@ -109,9 +110,8 @@ export default class Readline {
    * @param listener Listener to invoke.
    */
   addInputListener(listener: (data: string) => void) {
-    const req = this.eventInitial();
+    this.eventInitial();
     this.listeners.input = listener;
-    if (req) return this;
 
     this.rline.on("line", (data) => this.eventProcessing("input", String(data).trim()));
     return this;
@@ -123,9 +123,8 @@ export default class Readline {
    * @param listener Listener to invoke.
    */
   addActionListener(listener: (data: ActionData) => void) {
-    const req = this.eventInitial();
+    this.eventInitial();
     this.listeners.action = listener;
-    if (req) return this;
 
     this.rline.addListener("action", (data) => this.eventProcessing("action", data));
     return this;
@@ -164,6 +163,16 @@ export default class Readline {
   setPrompt(value: string) {
     this.rline.setPrompt(value + (value.endsWith(' ') ? '' : ' '));
     this.prompt = this.rline.getPrompt();
+  }
+
+  /**
+   * Covers the newly printed message over the previously printed message.
+   * 
+   * @param content Value.
+   */
+  cover(content: string) {
+    readline.cursorTo(process.stdout, 0, content.length);
+    process.stdout.write(content);
   }
 
   /**
