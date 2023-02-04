@@ -16,6 +16,7 @@ export default class Readline {
   private autoFoucs: boolean;
   private listeners: Record<ListenerName, (data: string|ActionData) => void|undefined>;
   private processing: boolean;
+  private coverMessageLength: number;
 
   /**
    * Initialization.
@@ -27,6 +28,7 @@ export default class Readline {
     });
     this.autoFoucs = true;
     this.processing = false;
+    this.coverMessageLength = 0;
     this.listeners = { input: undefined, action: undefined };
 
     readline.emitKeypressEvents(process.stdin, this.rline);
@@ -168,11 +170,22 @@ export default class Readline {
   /**
    * Covers the newly printed message over the previously printed message.
    * 
-   * @param content Value.
+   * @param message Value.
    */
-  cover(content: string) {
-    readline.cursorTo(process.stdout, 0, content.length);
-    process.stdout.write(content);
+  coverMessage(message: string) {
+    process.stdout.write(message);
+    this.coverMessageLength = (message.match(/\n/g) ?? []).length;
+    readline.cursorTo(process.stdout, 0, -1);
+  }
+
+  /**
+   * Move to cursor to new line and write.
+   * 
+   * @param message Value.
+   */
+  newLineToWirte(message: string) {
+    readline.cursorTo(process.stdout, 0, this.coverMessageLength);
+    process.stdout.write(message);
   }
 
   /**

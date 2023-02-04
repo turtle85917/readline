@@ -8,6 +8,7 @@ export default class Readline {
     private autoFoucs;
     private listeners;
     private processing;
+    private coverMessageLength;
     /**
      * Initialization.
      */
@@ -59,9 +60,15 @@ export default class Readline {
     /**
      * Covers the newly printed message over the previously printed message.
      *
-     * @param content Value.
+     * @param message Value.
      */
-    cover(content: string): void;
+    coverMessage(message: string): void;
+    /**
+     * Move to cursor to new line and write.
+     *
+     * @param message Value.
+     */
+    newLineToWirte(message: string): void;
     /**
      * Adjusts the scrolling of the terminal to match the terminal's last output value.
      */

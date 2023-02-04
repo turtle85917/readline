@@ -16,7 +16,7 @@ readline.processPrompts<"anything", { anything: string; }>([
     .setType("text")
     .setName("anything") // Use the same as the generic name
     .setMessage("Write anything")
-    .setInitial("I hate this module")
+    .setInitial("I hate this module.")
 ], (value) => {
   if (value.anything === undefined) return;
   console.log(value.anything);
@@ -45,17 +45,17 @@ readline.addInputListener((data) => {
 # Testcases
 In **test/index.ts**...
 
-> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%231.gif">
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%231.gif">
 
 In **test/second.ts**...
 
-> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
 
 > The reason it blinks is because a new message is uploaded. This will be fixed later.
 
-In **example/tictactoe.ts**...
+In **example/src/tictactoe.ts**...
 
-> <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
 
 # API
 *(preparing...)*

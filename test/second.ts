@@ -3,19 +3,18 @@
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline from "../src";
+import Readline from "../lib";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
 
 const WIDTH = 10;
 const HEIGHT = 6;
-const blocks = ["░░", "██"];
-let board = new Array(WIDTH * HEIGHT).fill(0);
+const block = "██";
 
-let player = { block: ansiFrame("██", TextStyle.F_YELLOW), x: 1, y: 1 };
+let player = { block: ansiFrame(block, TextStyle.F_YELLOW), x: 1, y: 1 };
 let status: Status = {
-  block: ansiFrame("██", TextStyle.F_MAGENTA),
-  goal: (g) => ansiFrame("██", g ? TextStyle.F_GREEN : TextStyle.F_RED),
+  block: ansiFrame(block, TextStyle.F_MAGENTA),
+  goal: (g) => ansiFrame(block, g ? TextStyle.F_GREEN : TextStyle.F_RED),
   blocks: [{ x: 4, y: 2 }, { x: 7, y: 3 }],
   goals: [{ x: 2, y: 5, g: false }, { x: 8, y: 1, g: false }]
 }
@@ -24,20 +23,20 @@ let lastActions: Step[] = [];
 
 const readline = new Readline();
 readline
-  .addReadyListener(() => readline.cover(getBoard()))
+  .addReadyListener(() => readline.coverMessage(getBoard()))
   .addActionListener((data) => {
     if (data.name === "undo") {
       let part = steps.slice(-3);
       if (part.every(step => step.kind === "player-move") && steps.length > 0) part = [part.at(-1)!];
       processSteps(part);
-      readline.cover(getBoard());
+      readline.coverMessage(getBoard());
       return;
     }
 
     if (data.name === "redo") {
       processSteps(lastActions, false);
       lastActions = [];
-      readline.cover(getBoard());
+      readline.coverMessage(getBoard());
       return;
     }
 
@@ -82,10 +81,10 @@ readline
       if (steps.at(-1)?.kind === "box-move") steps.push({ kind: "box-goal", x: goal.x, y: goal.y, index, goal: goal.g });
       goal.g = status.blocks.filter(item => item.x === goal.x && item.y === goal.y).length > 0;
     });
-    readline.cover(getBoard());
+    readline.coverMessage(getBoard());
 
     if (status.goals.every(item => item.g)) {
-      process.stdout.write("Clear!");
+      readline.newLineToWirte("Game clear!");
       process.exit();
     }
   })
@@ -127,10 +126,10 @@ function getBoard() {
   let result: string[] = [];
   for (let y = -1; y < HEIGHT+1; y++) {
     for (let x = -1; x < WIDTH+1; x++) {
-      if (x === -1 || y === -1 || x === WIDTH || y === HEIGHT) result.push(blocks.at(-1)!);
+      if (x === -1 || y === -1 || x === WIDTH || y === HEIGHT) result.push(block);
       else if (x === player.x && y === player.y) result.push(player.block);
       else {
-        result.push(blocks[board[y * WIDTH + x]]);
+        result.push("░░");
         for (const block of status.blocks) if (block.x === x && block.y === y) result[result.length-1] = status.block;
         for (const goal of status.goals) if (goal.x === x && goal.y === y) result[result.length-1] = status.goal(goal.g);
       }
