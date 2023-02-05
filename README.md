@@ -51,19 +51,15 @@ In **test/second.ts**...
 
 <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/testcase%232.gif">
 
-> The reason it blinks is because a new message is uploaded. This will be fixed later.
-
 In **example/src/tictactoe.ts**...
 
 <img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/tictactoe.gif">
 
-# API
-*(preparing...)*
-
 # Packages used
-|Name              |Author            |
-|:----------------:|:----------------:|
-|[prompts](https://npmjs.com/package/prompts)  MIT|[Terkel](https://github.com/terkelg)|
+|Name|License|Author|Note|
+|:--:|:--:|:--:|:--:|
+|[prompts](https://npmjs.com/package/prompts)|MIT|[Terkel](https://github.com/terkelg)|
+|[cli-cursor](https://www.npmjs.com/package/cli-cursor)|MIT|[Sindre Sorhus](https://github.com/sindresorhus)|src/index.ts L#181 - Reference.|
 
 # P.S.
 It is a module for the **author's personal study** and is not recommended for use because it was developed to suit *author's coding style*. 😉

@@ -3,7 +3,7 @@
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline from "../lib";
+import Readline from "../src";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
 
@@ -15,16 +15,19 @@ let player = { block: ansiFrame(block, TextStyle.F_YELLOW), x: 1, y: 1 };
 let status: Status = {
   block: ansiFrame(block, TextStyle.F_MAGENTA),
   goal: (g) => ansiFrame(block, g ? TextStyle.F_GREEN : TextStyle.F_RED),
-  blocks: [{ x: 4, y: 2 }, { x: 7, y: 3 }],
-  goals: [{ x: 2, y: 5, g: false }, { x: 8, y: 1, g: false }]
+  blocks: [{ x: 4, y: 2 }, { x: 7, y: 3 }, { x: 2, y: 1 }],
+  goals: [{ x: 2, y: 5, g: false }, { x: 8, y: 1, g: false }, { x: 4, y: 3, g: false }]
 }
 let steps: Step[] = [];
 let lastActions: Step[] = [];
 
 const readline = new Readline();
+readline.setCursorShow(false);
+readline.setKeypressDisable(true);
 readline
   .addReadyListener(() => readline.coverMessage(getBoard()))
   .addActionListener((data) => {
+    if (data.name === "submit") return;
     if (data.name === "undo") {
       let part = steps.slice(-3);
       if (part.every(step => step.kind === "player-move") && steps.length > 0) part = [part.at(-1)!];

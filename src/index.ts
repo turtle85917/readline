@@ -17,6 +17,7 @@ export default class Readline {
   private listeners: Record<ListenerName, (data: string|ActionData) => void|undefined>;
   private processing: boolean;
   private coverMessageLength: number;
+  private keypressDisable: boolean;
 
   /**
    * Initialization.
@@ -24,11 +25,11 @@ export default class Readline {
   constructor() {
     this.rline = readline.createInterface({
       input: process.stdin,
-      output: process.stdout
     });
     this.autoFoucs = true;
     this.processing = false;
     this.coverMessageLength = 0;
+    this.keypressDisable = false;
     this.listeners = { input: undefined, action: undefined };
 
     readline.emitKeypressEvents(process.stdin, this.rline);
@@ -50,6 +51,10 @@ export default class Readline {
 
       if (action !== '') this.rline.emit("action", { name: action, key } as ActionData);
     });
+    process.on("SIGINT", process.exit);
+    process.on("SIGQUIT", process.exit);
+    process.on("SIGBREAK", process.exit);
+    process.stdin.on("end", process.exit);
   }
 
   /**
@@ -92,6 +97,7 @@ export default class Readline {
   private eventProcessing(name: ListenerName, data: string | ActionData) {
     if (this.processing) return;
     this.clearScreen(this.autoFoucs);
+    if (name === "input" && this.keypressDisable) return;
     this.listeners[name](data);
     if (this.prompt !== undefined && !this.processing) this.rline.prompt();
   }
@@ -138,12 +144,9 @@ export default class Readline {
    * @param listener Listener to invoke.
    */
   addCloseListener(listener: (code: number) => void) {
-    process.on("SIGINT", process.exit);
-    process.on("SIGQUIT", process.exit);
-    process.on("SIGBREAK", process.exit);
-    process.stdin.on("end", process.exit);
     process.on("exit", (code) => {
       listener(code);
+      this.setCursorShow(true);
       this.rline.close();
     });
   }
@@ -168,6 +171,15 @@ export default class Readline {
   }
 
   /**
+   * Prevents receiving input even when it can receive input.
+   * 
+   * @param value Value.
+   */
+  setKeypressDisable(value: boolean) {
+    this.keypressDisable = value;
+  }
+
+  /**
    * Covers the newly printed message over the previously printed message.
    * 
    * @param message Value.
@@ -186,6 +198,16 @@ export default class Readline {
   newLineToWirte(message: string) {
     readline.cursorTo(process.stdout, 0, this.coverMessageLength);
     process.stdout.write(message);
+  }
+
+  /**
+   * Determines whether the cursor is visible.
+   * 
+   * @param value Value. Default value is `true`.
+   */
+  setCursorShow(value: boolean = true) {
+    if (!process.stderr.isTTY) return;
+    process.stderr.write(`\u001B[?25${value ? 'h' : 'l'}`);
   }
 
   /**
