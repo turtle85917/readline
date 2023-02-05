@@ -3,7 +3,7 @@
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline from "../src";
+import Readline from "../lib";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
 
@@ -24,6 +24,8 @@ let lastActions: Step[] = [];
 const readline = new Readline();
 readline.setCursorShow(false);
 readline.setKeypressDisable(true);
+readline.setOnlyDirectionKeys(true);
+readline.setASDWIsDirectionKeys(true);
 readline
   .addReadyListener(() => readline.coverMessage(getBoard()))
   .addActionListener((data) => {

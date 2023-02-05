@@ -1,4 +1,4 @@
-import Readline from "../lib";
+import Readline from "../src";
 import PromptBuilder from "../lib/promptBuilder";
 import { TextStyle } from "./enum/TextStyle";
 import { ansiFrame } from "./utils/ansiFrame";
@@ -31,9 +31,9 @@ readline.processPrompts<"apple"|"reason", { apple: string; reason: string|undefi
     .setName("reason")
     .setMessage("Why?")
     .setInitial("Reason")
-], (response) => {
-  appleLike = response.apple === "yes";
-  if (!appleLike && response.reason !== undefined) process.stdout.write(`The reason you hate apples is because of "${response.reason}".`);
+], ({ apple, reason }) => {
+  appleLike = apple === "yes";
+  if (!appleLike && reason !== undefined) process.stdout.write(`The reason you hate apples is because of "${reason}".`);
 });
 readline.addInputListener((data) => {
   if (data === "quit") process.exit();
@@ -49,13 +49,13 @@ readline.addInputListener((data) => {
           description: `${shopItem.price}won`,
           selected: shopItem.value === "apple" && shopItem.appleLike,
         })))
-    ], (value) => {
-      if (value.shop === undefined) return;
-      if (value.shop.length === 0) {
+    ], ({ shop }) => {
+      if (shop === undefined) return;
+      if (shop.length === 0) {
         process.stdout.write("Didn't buy anything...");
         return;
       }
-      let price = (value.shop as string[])
+      let price = shop
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
         .reduce((prev, curr) => prev + curr, 0);
@@ -63,7 +63,7 @@ readline.addInputListener((data) => {
       else {
         money -= price;
         const plusAnsi = ansiFrame("+)", TextStyle.F_BLUE);
-        value.shop.forEach((item: string) => {
+        shop.forEach((item: string) => {
           inventoryNewItem(item);
           console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });

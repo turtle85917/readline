@@ -10,27 +10,35 @@ import * as prompts from "prompts";
 import * as readline from "node:readline";
 import PromptBuilder from "./promptBuilder";
 
+const DIRECTION_KEYS = ["up", "down", "left", "right"];
+const ASDW_KEYS: Record<ASDW, string> = { 'a': "left", 's': "down", 'd': "right", 'w': "up" };
+
 export default class Readline {
   public prompt?: string;
   public rline: readline.Interface;
-  private autoFoucs: boolean;
   private listeners: Record<ListenerName, (data: string|ActionData) => void|undefined>;
-  private processing: boolean;
   private coverMessageLength: number;
+  private autoFoucs: boolean;
+  private processing: boolean;
   private keypressDisable: boolean;
+  private onlyDirectionKeys: boolean;
+  private ASDWIsDirectionKeys: boolean;
 
   /**
    * Initialization.
    */
   constructor() {
     this.rline = readline.createInterface({
-      input: process.stdin,
+      input: process.stdin
     });
+    this.coverMessageLength = 0;
+    this.listeners = { input: undefined, action: undefined };
+
     this.autoFoucs = true;
     this.processing = false;
-    this.coverMessageLength = 0;
     this.keypressDisable = false;
-    this.listeners = { input: undefined, action: undefined };
+    this.onlyDirectionKeys = false;
+    this.ASDWIsDirectionKeys = false;
 
     readline.emitKeypressEvents(process.stdin, this.rline);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
@@ -44,10 +52,12 @@ export default class Readline {
         if (key.name === 'y') action = "redo";
       }
 
-      if (key.name === "return") action = "submit" // Enter
-      if (key.name === "enter") action = "submit"; // Ctrl + J
+      if (!this.onlyDirectionKeys) {
+        if (key.name === "return") action = "submit" // Enter
+        if (key.name === "enter") action = "submit"; // Ctrl + J
+      }
       if (key.name === "abort") process.exit();
-      if (["up", "down", "left", "right"].some(k => key.name === k)) action = key.name;
+      if (DIRECTION_KEYS.some(k => key.name === k) || (this.ASDWIsDirectionKeys && Object.keys(ASDW_KEYS).some(k => key.name === k))) action = ASDW_KEYS[key.name as ASDW] ?? key.name
 
       if (action !== '') this.rline.emit("action", { name: action, key } as ActionData);
     });
@@ -72,11 +82,7 @@ export default class Readline {
     callback(response, json);
 
     if (Object.values(this.listeners).some(item => item !== undefined)) {
-      this.rline = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
-      this.setPrompt(this.prompt);
+      this.newReadline();
       process.stdout.write('\n');
       if (this.listeners.input !== undefined) {
         if (this.prompt !== undefined) this.rline.prompt();
@@ -87,19 +93,6 @@ export default class Readline {
     }
 
     return response;
-  }
-
-  private eventInitial() {
-    if (!this.processing) this.clearScreen();
-    this.rline.emit("ready");
-  }
-
-  private eventProcessing(name: ListenerName, data: string | ActionData) {
-    if (this.processing) return;
-    this.clearScreen(this.autoFoucs);
-    if (name === "input" && this.keypressDisable) return;
-    this.listeners[name](data);
-    if (this.prompt !== undefined && !this.processing) this.rline.prompt();
   }
 
   /**
@@ -177,6 +170,25 @@ export default class Readline {
    */
   setKeypressDisable(value: boolean) {
     this.keypressDisable = value;
+    this.newReadline();
+  }
+
+  /**
+   * Specifies that only the arrow keys are input unconditionally.
+   * 
+   * @param value Value.
+   */
+  setOnlyDirectionKeys(value: boolean) {
+    this.onlyDirectionKeys = value;
+  }
+
+  /**
+   * It determines whether the A, S, D, W keys are used as direction keys.
+   * 
+   * @param value Value.
+   */
+  setASDWIsDirectionKeys(value: boolean) {
+    this.ASDWIsDirectionKeys = value;
   }
 
   /**
@@ -210,16 +222,37 @@ export default class Readline {
     process.stderr.write(`\u001B[?25${value ? 'h' : 'l'}`);
   }
 
-  /**
-   * Adjusts the scrolling of the terminal to match the terminal's last output value.
-   */
   private clearScreen(value: boolean = true) {
     if (value !== undefined && !value) return;
     console.log('\n'.repeat(Math.max(process.stdout.rows-2, 0)));
     readline.cursorTo(process.stdout, 0, 0);
     readline.clearScreenDown(process.stdout);
   }
+
+  private newReadline() {
+    this.rline.close();
+    this.rline = readline.createInterface({
+      input: process.stdin,
+      output: this.keypressDisable ? undefined : process.stdout
+    });
+    if (this.prompt !== undefined) this.setPrompt(this.prompt);
+  }
+
+  private eventInitial() {
+    if (!this.processing) this.clearScreen();
+    this.rline.emit("ready");
+  }
+
+  private eventProcessing(name: ListenerName, data: string | ActionData) {
+    if (this.processing) return;
+    this.clearScreen(this.autoFoucs);
+    if (name === "input" && this.keypressDisable) return;
+    this.listeners[name](data);
+    if (this.prompt !== undefined && !this.processing) this.rline.prompt();
+  }
 }
+
+type ASDW = 'a' | 's' | 'd' | 'w';
 
 type ListenerName = "input" | "action";
 

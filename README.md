@@ -32,7 +32,7 @@ import FunnyTerminal from "funny-terminal";
 
 const readline = new FunnyTerminal();
 readline.setPrompt("Input>");
-readline.setAutoFocus(true); //  Automatically scrolls the screen. Default value is `true`.
+readline.setAutoFocus(true); // Automatically scrolls the screen. Default value is `true`.
 readline.addInputListener((data) => {
   if (data === "quit") process.exit();
   console.log(`Recived : ${data}`);
@@ -41,6 +41,35 @@ readline.addInputListener((data) => {
 ```
 
 *Stop typing when the processPrompt is invoked.*
+
+<hr />
+
+```js
+import FunnyTerminal from "funny-terminal";
+
+const readline = new FunnyTerminal();
+readline.setCursorShow(false);
+readline.setKeypressDisable(true);
+readline
+  .addReadyListener(() => readline.coverMessage("Test message #1"))
+  .addActionListener(data => {
+    /**
+      data: `object`
+      ├ name: `string`
+      ├ key: `object`
+      │ ├ sequence: `string`
+      │ ├ name: `string`
+      │ ├ ctrl: `boolean`
+      │ ├ meta: `boolean`
+      │ ├ shift: `boolean`
+      └ └ code: `string`
+    */
+    if (data.name === "left") readline.coverMessage("Test message #0"); // Left Arrow Key.
+    if (data.name === "right") readline.coverMessage("Test message #1");// Right Arrow Key.
+  });
+```
+
+Please check test/second.ts for more details.
 
 # Testcases
 In **test/index.ts**...
@@ -63,3 +92,5 @@ In **example/src/tictactoe.ts**...
 
 # P.S.
 It is a module for the **author's personal study** and is not recommended for use because it was developed to suit *author's coding style*. 😉
+
+***I hate this module.***

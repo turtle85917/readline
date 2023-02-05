@@ -5,10 +5,13 @@ import PromptBuilder from "./promptBuilder";
 export default class Readline {
     prompt?: string;
     rline: readline.Interface;
-    private autoFoucs;
     private listeners;
-    private processing;
     private coverMessageLength;
+    private autoFoucs;
+    private processing;
+    private keypressDisable;
+    private onlyDirectionKeys;
+    private ASDWIsDirectionKeys;
     /**
      * Initialization.
      */
@@ -19,8 +22,6 @@ export default class Readline {
      * @param prompt prompt array.
      */
     processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void | Promise<void>): Promise<U>;
-    private eventInitial;
-    private eventProcessing;
     /**
      * Call the listener when setup finished.
      *
@@ -58,6 +59,24 @@ export default class Readline {
      */
     setPrompt(value: string): void;
     /**
+     * Prevents receiving input even when it can receive input.
+     *
+     * @param value Value.
+     */
+    setKeypressDisable(value: boolean): void;
+    /**
+     * Specifies that only the arrow keys are input unconditionally.
+     *
+     * @param value Value.
+     */
+    setOnlyDirectionKeys(value: boolean): void;
+    /**
+     * It determines whether the A, S, D, W keys are used as direction keys.
+     *
+     * @param value Value.
+     */
+    setASDWIsDirectionKeys(value: boolean): void;
+    /**
      * Covers the newly printed message over the previously printed message.
      *
      * @param message Value.
@@ -70,9 +89,15 @@ export default class Readline {
      */
     newLineToWirte(message: string): void;
     /**
-     * Adjusts the scrolling of the terminal to match the terminal's last output value.
+     * Determines whether the cursor is visible.
+     *
+     * @param value Value. Default value is `true`.
      */
+    setCursorShow(value?: boolean): void;
     private clearScreen;
+    private newReadline;
+    private eventInitial;
+    private eventProcessing;
 }
 interface ActionData {
     name: string;
