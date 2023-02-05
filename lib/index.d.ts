@@ -1,7 +1,8 @@
 /// <reference types="node" />
 import * as prompts from "prompts";
 import * as readline from "node:readline";
-import PromptBuilder from "./promptBuilder";
+import { PromptBuilder } from "./utils";
+export * from "./utils";
 export default class Readline {
     prompt?: string;
     rline: readline.Interface;
@@ -111,4 +112,3 @@ interface Key {
     shift: boolean;
     code: string;
 }
-export {};

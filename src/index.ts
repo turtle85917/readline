@@ -8,10 +8,12 @@
 
 import * as prompts from "prompts";
 import * as readline from "node:readline";
-import PromptBuilder from "./promptBuilder";
+import { PromptBuilder } from "./utils";
 
 const DIRECTION_KEYS = ["up", "down", "left", "right"];
 const ASDW_KEYS: Record<ASDW, string> = { 'a': "left", 's': "down", 'd': "right", 'w': "up" };
+
+export * from "./utils";
 
 export default class Readline {
   public prompt?: string;

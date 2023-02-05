@@ -2,7 +2,7 @@ import * as prompts from "prompts";
 /**
  * Create a prompt builder.
  */
-export default class PromptBuilder<T extends string> {
+export declare class PromptBuilder<T extends string> {
     row: prompts.PromptObject;
     /**
      * Initialization.

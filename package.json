@@ -15,12 +15,18 @@
   },
   "keywords": [
     "ui",
+    "ask",
     "cli",
+    "prompt",
+    "prompts",
     "readline",
-    "prompts"
+    "prompts",
+    "stdin",
+    "console",
+    "command-line"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/turtle85917/readline#readme",
+  "homepage": "https://github.com/turtle85917/readline",
   "dependencies": {
     "@types/node": "^18.11.18",
     "@types/prompts": "^2.4.2",

@@ -8,7 +8,7 @@
 
 # Examples
 ```js
-import FunnyTerminal from "funny-terminal";
+import FunnyTerminal, { PromptBuilder } from "funny-terminal";
 
 const readline = new FunnyTerminal();
 readline.processPrompts<"anything", { anything: string; }>([

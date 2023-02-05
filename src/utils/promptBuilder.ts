@@ -1,5 +1,5 @@
 /*
-* File: index.ts
+* File: promptBuilder.ts
 * 
 * Copyright (c) 2022-2022 turtle85917
 * 
@@ -11,7 +11,7 @@ import * as prompts from "prompts";
 /**
  * Create a prompt builder.
  */
-export default class PromptBuilder<T extends string> {
+export class PromptBuilder<T extends string> {
   row: prompts.PromptObject;
 
   /**
