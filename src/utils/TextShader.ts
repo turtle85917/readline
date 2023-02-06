@@ -11,11 +11,9 @@ import { Frame } from "./Frame";
 
 export class TextShader {
   private message: string;
-  private shaders: Record<string, ShaderDetailed>;
-  private char: string | null;
-  private position: number;
-  private nextPosition: number;
+  private shaders: Shaders;
   private resultMessages: string[];
+  private lastIndex: number;
 
   public get result() {
     return this.resultMessages.join('');
@@ -24,60 +22,36 @@ export class TextShader {
   constructor(message: string) {
     this.message = message;
     this.shaders = {};
-    this.char = null;
-    this.position = 0;
-    this.nextPosition = 0;
     this.resultMessages = [];
-
-    this.readChar();
+    this.lastIndex = 0;
   }
 
   applyShaders(shaders: Shaders) {
-    this.shaders = {};
-    for (const [k, v] of Object.entries(shaders)) {
-      if (k.length > 1) {
-        this.shaders[k[0]] = { shaders: v, tail: k.slice(1) };
-      } else this.shaders[k] = { shaders: v };
-    }
-    while (this.nextPosition <= this.message.length) this.nextToken();
+    this.shaders = shaders;
+    this.resultMessages = [];
+    this.message.replace(new RegExp(Object.keys(this.shaders).join('|'), 'g'), (substring: string, index: number) => {
+      if (this.resultMessages.length === 0) {
+        this.lastIndex = substring.length + index;
+        const [f, m, e] = this.split(this.message, index, this.lastIndex);
+        this.resultMessages.push(f, Frame(m, ...this.shaders[substring]), e);
+      } else {
+        const lastIndex = substring.length+index;
+        const [f, m, e] = this.split(this.resultMessages.at(-1), index-this.lastIndex, lastIndex-this.lastIndex);
+        this.lastIndex = lastIndex;
+        this.resultMessages.pop();
+        this.resultMessages.push(f, Frame(m, ...this.shaders[substring]), e);
+      }
+      return substring;
+    });
+
     return this;
   }
 
-  private readChar() {
-    this.char = this.nextPosition >= this.message.length ? null : this.message[this.nextPosition];
-    this.position = this.nextPosition;
-    this.nextPosition++;
-  }
-
-  private nextToken() {
-    if (this.char !== null) {
-      const currentShader = this.shaders[this.char];
-      if (currentShader !== undefined) {
-        if (currentShader.tail) {
-          const complete = `${this.char}${currentShader.tail}`;
-          const position = this.position;
-          this.readChar();
-          while (currentShader.tail.includes(this.char)) this.readChar();
-
-          const messagePart = this.message.slice(position, this.position);
-          if (complete === messagePart) this.resultMessages.push(Frame(messagePart, ...currentShader.shaders), this.char);
-          else this.resultMessages.push(messagePart, this.char);
-        } else {
-          this.resultMessages.push(Frame(this.char, ...currentShader.shaders));
-        }
-      } else {
-        this.resultMessages.push(this.char);
-      }
-    }
-    this.readChar();
+  private split(content: string, ...indices: number[]) {
+    return [0, ...indices].map((item, index, array) => content.slice(item, array[index+1]));
   }
 }
 
 type Shaders = Record<string, NonNullable<ShaderValue>>;
 
 type ShaderValue = TextStyle[] | undefined;
-
-interface ShaderDetailed {
-  shaders: TextStyle[];
-  tail?: string;
-}

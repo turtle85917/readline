@@ -6,7 +6,7 @@
 * Licensed under MIT License. Please see more defails in LICENSE file.
 */
 
-export * from "./promptBuilder";
-export * from "./modalBuilder";
+export * from "./PromptBuilder";
+export * from "./ModalBuilder";
 export * from "./TextShader";
 export * from "./Frame";

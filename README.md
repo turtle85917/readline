@@ -56,13 +56,13 @@ readline
     /**
       data: `object`
       ├ name: `string`
-      ├ key: `object`
-      │ ├ sequence: `string`
-      │ ├ name: `string`
-      │ ├ ctrl: `boolean`
-      │ ├ meta: `boolean`
-      │ ├ shift: `boolean`
-      └ └ code: `string`
+      └ key: `object`
+        ├ sequence: `string`
+        ├ name: `string`
+        ├ ctrl: `boolean`
+        ├ meta: `boolean`
+        ├ shift: `boolean`
+        └ code: `string`
     */
     if (data.name === "left") readline.coverMessage("Test message #0"); // Left Arrow Key.
     if (data.name === "right") readline.coverMessage("Test message #1");// Right Arrow Key.
