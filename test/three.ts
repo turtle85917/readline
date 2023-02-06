@@ -1,12 +1,26 @@
-import { TextStyle } from "./enum/TextStyle";
-import { ansiFrame } from "./utils/ansiFrame";
+import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "../src";
 
-process.stdout.write([
-  ansiFrame('████', TextStyle.F_CYAN),
-  `${ansiFrame('████', TextStyle.F_CYAN)}┌─ ${ansiFrame("콘서티", TextStyle.F_MAGENTA)} ────────────────────────┐`,
-  '  └─┤  야옹...                        │',
-  `    └────────────────────────── ${ansiFrame('Q', TextStyle.F_RED, TextStyle.UNDERSCORE)}${ansiFrame('uit', TextStyle.F_RED)} ─┘`,
-  `      (${ansiFrame("▶", TextStyle.F_BLUE, TextStyle.UNDERSCORE)}) 착한 고양이구나`,
-  `      ( ) 츄르 줄까?`,
-  `      ( ) 으으악!!!`
-].join('\n'));
+// const readline = new Readline();
+// readline.processPrompts<"openModal", { openModal: boolean; }>([
+//   new PromptBuilder()
+//     .setType("select")
+//     .setName("openModal")
+//     .setMessage("Would you like to open the modal?")
+//     .setChoices([
+//       { title: "Open modal", value: "open" },
+//       { title: "No", value: "no" }
+//     ])
+// ], ({ openModal }) => {
+//   if (openModal) {
+//     new ModalBuilder("Hello, World!");
+//   }
+// });
+
+console.log(
+  new TextShader("Hello, World! ×5")
+  .applyShaders({
+    'o, W': [TextStyle.F_MAGENTA],
+    '×1': [TextStyle.F_YELLOW]
+  })
+  .result
+);

@@ -10,5 +10,5 @@
     "removeComments": false,
   },
   "exclude": ["node_modules"],
-  "include": ["src/*.ts", "src/utils/*.ts"],
+  "include": ["src/*"],
 }

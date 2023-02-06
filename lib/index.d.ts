@@ -3,6 +3,7 @@ import * as prompts from "prompts";
 import * as readline from "node:readline";
 import { PromptBuilder } from "./utils";
 export * from "./utils";
+export * from "./enums";
 export default class Readline {
     prompt?: string;
     rline: readline.Interface;

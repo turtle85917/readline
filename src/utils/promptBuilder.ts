@@ -9,10 +9,10 @@
 import * as prompts from "prompts";
 
 /**
- * Create a prompt builder.
+ * Create a prompt json.
  */
 export class PromptBuilder<T extends string> {
-  row: prompts.PromptObject;
+  private row: prompts.PromptObject;
 
   /**
    * Initialization.

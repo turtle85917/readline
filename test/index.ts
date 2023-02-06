@@ -1,6 +1,4 @@
-import Readline, { PromptBuilder } from "../lib";
-import { TextStyle } from "./enum/TextStyle";
-import { ansiFrame } from "./utils/ansiFrame";
+import Readline, { PromptBuilder, TextStyle, Frame } from "../lib";
 
 let money = 3500;
 let inventory: Inventory[] = [];
@@ -58,24 +56,24 @@ readline.addInputListener((data) => {
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
         .reduce((prev, curr) => prev + curr, 0);
-      if (money < price) process.stdout.write(`You don't have enough money...\n→ ${price} - ${ansiFrame(`your: ${money}`, TextStyle.F_MAGENTA)} = ${ansiFrame(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
+      if (money < price) process.stdout.write(`You don't have enough money...\n→ ${price} - ${Frame(`your: ${money}`, TextStyle.F_MAGENTA)} = ${Frame(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
       else {
         money -= price;
-        const plusAnsi = ansiFrame("+)", TextStyle.F_BLUE);
+        const plusAnsi = Frame("+)", TextStyle.F_BLUE);
         shop.forEach((item: string) => {
           inventoryNewItem(item);
           console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });
-        process.stdout.write(`└ ${plusAnsi} You have ${ansiFrame(`${money}won`, TextStyle.BRIGHT)} left over from the buy. (${ansiFrame(`-${price}won`, TextStyle.F_RED)})`);
+        process.stdout.write(`└ ${plusAnsi} You have ${Frame(`${money}won`, TextStyle.BRIGHT)} left over from the buy. (${Frame(`-${price}won`, TextStyle.F_RED)})`);
       }
     });
   }
   if (data === "inventory") {
-    process.stdout.write(ansiFrame("In your current bag...", TextStyle.DIM));
-    console.log(`\n${ansiFrame("*)", TextStyle.F_CYAN)} 💰 ${money.toLocaleString()}won.`);
+    process.stdout.write(Frame("In your current bag...", TextStyle.DIM));
+    console.log(`\n${Frame("*)", TextStyle.F_CYAN)} 💰 ${money.toLocaleString()}won.`);
     inventory.forEach(item => {
       const currentItem = findItem(item.staticId)!;
-      console.log(`${ansiFrame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
+      console.log(`${Frame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
     });
   }
 });
