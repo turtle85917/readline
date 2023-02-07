@@ -1,4 +1,4 @@
-import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "../lib";
+import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "../src";
 
 const readline = new Readline();
 readline.processPrompts<"openModal", { openModal: boolean; }>([
@@ -12,7 +12,7 @@ readline.processPrompts<"openModal", { openModal: boolean; }>([
     ])
 ], ({ openModal }) => {
   if (openModal) {
-    new ModalBuilder("Hello, World!");
+    new ModalBuilder("Hello, World! 안녕, 세상! こんにちは世界！ It's just something I wrote down to write a long message, you can ignore it.");
   }
 });
 
