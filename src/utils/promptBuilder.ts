@@ -1,5 +1,5 @@
 /*
-* File: promptBuilder.ts
+* File: PromptBuilder.ts
 * 
 * Copyright (c) 2022-2022 turtle85917
 * 

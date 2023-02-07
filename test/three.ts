@@ -1,4 +1,4 @@
-import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "../src";
+import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "../lib";
 
 // const readline = new Readline();
 // readline.processPrompts<"openModal", { openModal: boolean; }>([
