@@ -17,10 +17,13 @@ import Readline, { ModalBuilder, PromptBuilder, TextShader, TextStyle } from "..
 // });
 
 console.log(
-  new TextShader("Hello, World! ×5") // lo, Wor만 색칠되어야 하는데 아예 색칠이 안됨
+  new TextShader("Jaimy) Hello! ×5")
   .applyShaders({
-    'lo, Wor': [TextStyle.F_MAGENTA],
-    '!': [TextStyle.F_CYAN]
+    'lo!': [TextStyle.F_CYAN]
   })
+  .applyRules([
+    { rule: /×\d+/, shaders: [TextStyle.F_YELLOW] },
+    { rule: /([A-Z])\w+\)/, shaders: [TextStyle.F_MAGENTA] }
+  ])
   .result
 );
