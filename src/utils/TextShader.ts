@@ -11,40 +11,77 @@ import { Frame } from "./Frame";
 
 export class TextShader {
   private message: string;
-  private shaders: Shaders;
-  private resultMessages: string[];
   private lastIndex: number;
+  private shaders: Shaders;
+  private rules: Rule[];
+  private resultMessages: string[];
 
   public get result() {
+    this.render();
     return this.resultMessages.join('');
   }
 
+  /**
+   * Initialization.
+   * 
+   * @param message 
+   */
   constructor(message: string) {
     this.message = message;
-    this.shaders = {};
-    this.resultMessages = [];
     this.lastIndex = 0;
+    this.shaders = {};
+    this.rules = [];
+    this.resultMessages = [];
   }
 
+  /**
+   * Style the text.
+   * 
+   * @param shaders The text to be replaced and the style list object.
+   */
   applyShaders(shaders: Shaders) {
     this.shaders = shaders;
-    this.resultMessages = [];
-    this.message.replace(new RegExp(Object.keys(this.shaders).join('|'), 'g'), (substring: string, index: number) => {
-      if (this.resultMessages.length === 0) {
-        this.lastIndex = substring.length + index;
-        const [f, m, e] = this.split(this.message, index, this.lastIndex);
-        this.resultMessages.push(f, Frame(m, ...this.shaders[substring]), e);
-      } else {
-        const lastIndex = substring.length+index;
-        const [f, m, e] = this.split(this.resultMessages.at(-1), index-this.lastIndex, lastIndex-this.lastIndex);
-        this.lastIndex = lastIndex;
-        this.resultMessages.pop();
-        this.resultMessages.push(f, Frame(m, ...this.shaders[substring]), e);
-      }
-      return substring;
-    });
-
     return this;
+  }
+
+  /**
+   * Use regular expressions to fine-tune the style.
+   * 
+   * @param rules A rule and style list array.
+   */
+  applyRules(rules: Rule[]) {
+    this.rules = rules;
+    return this;
+  }
+
+  private render() {
+    this.resultMessages = [];
+    [...this.message.matchAll(new RegExp([...Object.keys(this.shaders), ...this.rules].map(item => {
+      if (typeof item === "object") return item.rule.toString().slice(1, -1);
+      return item;
+    }).join('|'), 'g'))].forEach(match => {
+      const findShader = this.shaders[match[0]];
+      if (findShader === undefined) {
+        const findRule = this.rules.find(item => item.rule.test(match[0]));
+        this.newResultMessage(match[0], match.index, findRule.shaders);
+      } else {
+        this.newResultMessage(match[0], match.index, findShader);
+      }
+    });
+  }
+
+  private newResultMessage(substring: string, index: number, shaders: TextStyle[]) {
+    if (this.resultMessages.length === 0) {
+      this.lastIndex = substring.length + index;
+      const [f, m, e] = this.split(this.message, index, this.lastIndex);
+      this.resultMessages.push(f, Frame(m, ...shaders), e);
+    } else {
+      const lastIndex = substring.length+index;
+      const [f, m, e] = this.split(this.resultMessages.at(-1), index-this.lastIndex, lastIndex-this.lastIndex);
+      this.lastIndex = lastIndex;
+      this.resultMessages.pop();
+      this.resultMessages.push(f, Frame(m, ...shaders), e);
+    }
   }
 
   private split(content: string, ...indices: number[]) {
@@ -52,6 +89,9 @@ export class TextShader {
   }
 }
 
-type Shaders = Record<string, NonNullable<ShaderValue>>;
+type Shaders = Record<string, TextStyle[]>;
 
-type ShaderValue = TextStyle[] | undefined;
+interface Rule {
+  rule: RegExp;
+  shaders: TextStyle[];
+}
