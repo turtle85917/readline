@@ -12,10 +12,10 @@ export class ModalBuilder {
   constructor(message: string) {
     this.rowLine = '─'.repeat(process.stdout.columns-2);
 
-    console.log(`┌${this.rowLine}┐`);
-    console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
-    console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
-    console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
-    console.log(`└${this.rowLine}┘`);
+    // console.log(`┌${this.rowLine}┐`);
+    // console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
+    // console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
+    // console.log(`│${' '.repeat(process.stdout.columns-2)}│`);
+    // console.log(`└${this.rowLine}┘`);
   }
 }

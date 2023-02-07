@@ -1,7 +1,4 @@
 import * as prompts from "prompts";
-/**
- * Create a prompt json.
- */
 export declare class PromptBuilder<T extends string> {
     private row;
     /**

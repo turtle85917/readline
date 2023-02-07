@@ -8,9 +8,6 @@
 
 import * as prompts from "prompts";
 
-/**
- * Create a prompt json.
- */
 export class PromptBuilder<T extends string> {
   private row: prompts.PromptObject;
 
