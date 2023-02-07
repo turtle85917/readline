@@ -89,6 +89,14 @@ console.log(
 );
 ```
 
+*Result:*
+
+<img src="https://raw.githubusercontent.com/turtle85917/readline/master/.github/imgs/textshader.png">
+
+`.applyShaders` : Only specified text parts can be colored.
+
+`.applyRules` : Specifies the color of a string with rules.
+
 # Testcases
 In **test/index.ts**...
 
