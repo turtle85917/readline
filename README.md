@@ -71,6 +71,24 @@ readline
 
 Please check test/second.ts for more details.
 
+<hr />
+
+```js
+import { TextShader, TextStyle } from "funny-terminal";
+
+console.log(
+  new TextShader("Jaimy) Hello! ×5")
+  .applyShaders({
+    'lo!': [TextStyle.F_CYAN]
+  })
+  .applyRules([
+    { rule: /×\d+/, shaders: [TextStyle.F_YELLOW] },
+    { rule: /([A-Z])\w+\)/, shaders: [TextStyle.F_MAGENTA] }
+  ])
+  .result
+);
+```
+
 # Testcases
 In **test/index.ts**...
 

@@ -8,6 +8,7 @@
     "sourceMap": true,
     "noEmitOnError": true,
     "removeComments": false,
+    "strict": true
   },
   "exclude": ["node_modules"],
   "include": ["src/*"],

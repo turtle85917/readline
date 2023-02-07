@@ -12,18 +12,7 @@ readline.processPrompts<"openModal", { openModal: boolean; }>([
     ])
 ], ({ openModal }) => {
   if (openModal) {
-    new ModalBuilder("Hello, World! 안녕, 세상! こんにちは世界！ It's just something I wrote down to write a long message, you can ignore it.");
+    const modal = new ModalBuilder("Hello, World! 안녕, 세상! こんにちは世界！ It's just something I wrote down to write a long message, you can ignore it. I have to write down anything, but I don't know what to say, but I'm just saying anything to increase the length.");
+    console.log(modal.result);
   }
 });
-
-// console.log(
-//   new TextShader("Jaimy) Hello! ×5")
-//   .applyShaders({
-//     'lo!': [TextStyle.F_CYAN]
-//   })
-//   .applyRules([
-//     { rule: /×\d+/, shaders: [TextStyle.F_YELLOW] },
-//     { rule: /([A-Z])\w+\)/, shaders: [TextStyle.F_MAGENTA] }
-//   ])
-//   .result
-// );

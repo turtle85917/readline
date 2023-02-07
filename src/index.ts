@@ -19,7 +19,7 @@ export * from "./enums";
 export default class Readline {
   public prompt?: string;
   public rline: readline.Interface;
-  private listeners: Record<ListenerName, (data: string|ActionData) => void|undefined>;
+  private listeners: Record<ListenerName, ((data: any) => void)|undefined>;
   private coverMessageLength: number;
   private autoFoucs: boolean;
   private processing: boolean;
@@ -250,7 +250,7 @@ export default class Readline {
     if (this.processing) return;
     this.clearScreen(this.autoFoucs);
     if (name === "input" && this.keypressDisable) return;
-    this.listeners[name](data);
+    this.listeners[name]?.(data);
     if (this.prompt !== undefined && !this.processing) this.rline.prompt();
   }
 }

@@ -9,27 +9,25 @@
 import { Tree } from "../enums";
 
 export class ModalBuilder {
+  private message: string;
   private close: boolean;
   private writeRow: number;
   private rowLine: string;
   private texture: string[];
 
+  
+  public get result() {
+    this.render();
+    return this.texture.join('\n');
+  }
+  
+
   constructor(message: string) {
-    this.rowLine = '─'.repeat(process.stdout.columns-2);
-    this.writeRow = 1;
+    this.writeRow = 0;
     this.close = false;
+    this.message = message;
+    this.rowLine = '─'.repeat(process.stdout.columns-2);
     this.texture = [this.frameTree(this.rowLine, "TOP_OPEN", "TOP_CLOSE")];
-
-    this.texture.push(this.frameTree(
-      this.getTextLength(message) >= process.stdout.columns-2
-        ? message.slice(0, (this.getTextLength(message) - process.stdout.columns + 2) * -1)
-        : message
-      , "MIDDLE_CELL", "MIDDLE_CELL"));
-
-    this.writeRow = this.getTextLength(message) - process.stdout.columns + 2;
-    // TODO new line
-    this.closeModal();
-    process.stdout.write(this.texture.join('\n'));
   }
 
   private frameTree(message: string, ...trees: (keyof typeof Tree)[]) {
@@ -46,7 +44,16 @@ export class ModalBuilder {
     return result;
   }
 
-  private writeTexture(newLine: boolean = true) {
+  private writeText(message?: string) {
+    if (this.close) return null;
+    const content = message ?? this.message.slice(this.writeRow);
+    const writeMessage = this.getTextLength(content) >= process.stdout.columns-2
+      ? content.slice(0, (this.getTextLength(content) - process.stdout.columns + 2) * -1)
+      : content + ' '.repeat(process.stdout.columns-this.getTextLength(content)-2)
+    ;
+
+    this.texture.push(this.frameTree(writeMessage, "MIDDLE_CELL", "MIDDLE_CELL"));
+    return writeMessage;
   }
 
   private closeModal() {
@@ -54,6 +61,14 @@ export class ModalBuilder {
     this.close = true;
     this.texture.push(this.frameTree(this.rowLine, "BOTTOM_OPEN", "BOTTOM_CLOSE"));
     return true;
+  }
+
+  private render() {
+    const result = this.writeText();
+    this.writeRow = result?.length ?? 0;
+    while (this.writeRow <= this.message.length) this.writeRow += this.writeText()?.length ?? 0;
+
+    this.closeModal();
   }
 
   private getTextLength(message: string) {

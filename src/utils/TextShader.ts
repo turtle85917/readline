@@ -63,9 +63,9 @@ export class TextShader {
       const findShader = this.shaders[match[0]];
       if (findShader === undefined) {
         const findRule = this.rules.find(item => item.rule.test(match[0]));
-        this.newResultMessage(match[0], match.index, findRule.shaders);
+        this.newResultMessage(match[0], match.index!, findRule!.shaders);
       } else {
-        this.newResultMessage(match[0], match.index, findShader);
+        this.newResultMessage(match[0], match.index!, findShader);
       }
     });
   }
@@ -77,7 +77,7 @@ export class TextShader {
       this.resultMessages.push(f, Frame(m, ...shaders), e);
     } else {
       const lastIndex = substring.length+index;
-      const [f, m, e] = this.split(this.resultMessages.at(-1), index-this.lastIndex, lastIndex-this.lastIndex);
+      const [f, m, e] = this.split(this.resultMessages.at(-1)!, index-this.lastIndex, lastIndex-this.lastIndex);
       this.lastIndex = lastIndex;
       this.resultMessages.pop();
       this.resultMessages.push(f, Frame(m, ...shaders), e);
