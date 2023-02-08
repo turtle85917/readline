@@ -100,6 +100,7 @@ export default class Readline {
     private newReadline;
     private eventInitial;
     private eventProcessing;
+    private printPrompt;
 }
 interface ActionData {
     name: string;

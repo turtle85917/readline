@@ -36,7 +36,7 @@ export default class Readline {
     });
     this.coverMessageLength = 0;
     this.listeners = { input: undefined, action: undefined };
-
+    
     this.autoFoucs = true;
     this.processing = false;
     this.keypressDisable = false;
@@ -76,7 +76,6 @@ export default class Readline {
    * @param prompt prompt array.
    */
   async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void|Promise<void>) {
-    // BUG Normal behavior after prompt handling. Abnormal before that. 
     this.rline.close();
     this.processing = true;
     this.clearScreen();
@@ -116,6 +115,8 @@ export default class Readline {
    */
   addInputListener(listener: (data: string) => void) {
     this.eventInitial();
+    this.newReadline();
+    this.printPrompt();
     this.listeners.input = listener;
 
     this.rline.on("line", (data) => this.eventProcessing("input", String(data).trim()));
@@ -239,7 +240,7 @@ export default class Readline {
       input: process.stdin,
       output: this.keypressDisable ? undefined : process.stdout
     });
-    if (this.prompt !== undefined) this.setPrompt(this.prompt);
+    this.printPrompt();
   }
 
   private eventInitial() {
@@ -252,6 +253,11 @@ export default class Readline {
     this.clearScreen(this.autoFoucs);
     if (name === "input" && this.keypressDisable) return;
     this.listeners[name]?.(data);
+    this.printPrompt();
+  }
+
+  private printPrompt() {
+    this.setPrompt(this.prompt ?? '>');
     if (this.prompt !== undefined && !this.processing) this.rline.prompt();
   }
 }
