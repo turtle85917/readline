@@ -7,7 +7,7 @@
 */
 
 import { TextStyle } from "../enums";
-import { Frame } from "./Frame";
+import { putStyle } from "./Frame";
 
 export class TextShader {
   private message: string;
@@ -74,13 +74,13 @@ export class TextShader {
     if (this.resultMessages.length === 0) {
       this.lastIndex = substring.length + index;
       const [f, m, e] = this.split(this.message, index, this.lastIndex);
-      this.resultMessages.push(f, Frame(m, ...shaders), e);
+      this.resultMessages.push(f, putStyle(m, ...shaders), e);
     } else {
       const lastIndex = substring.length+index;
       const [f, m, e] = this.split(this.resultMessages.at(-1)!, index-this.lastIndex, lastIndex-this.lastIndex);
       this.lastIndex = lastIndex;
       this.resultMessages.pop();
-      this.resultMessages.push(f, Frame(m, ...shaders), e);
+      this.resultMessages.push(f, putStyle(m, ...shaders), e);
     }
   }
 

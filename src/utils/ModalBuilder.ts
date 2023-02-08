@@ -6,7 +6,8 @@
 * Licensed under MIT License. Please see more defails in LICENSE file.
 */
 
-import { Tree } from "../enums";
+import { TextStyle, Tree } from "../enums";
+import { putStyle, clearStyle } from "./Frame";
 
 export class ModalBuilder {
   private message: string;
@@ -15,7 +16,6 @@ export class ModalBuilder {
   private rowLine: string;
   private texture: string[];
 
-  
   public get result() {
     this.render();
     return this.texture.join('\n');
@@ -27,18 +27,17 @@ export class ModalBuilder {
     this.close = false;
     this.message = message;
     this.rowLine = '─'.repeat(process.stdout.columns-2);
-    this.texture = [this.frameTree(this.rowLine, "TOP_OPEN", "TOP_CLOSE")];
+    this.texture = [this.frameTree(this.rowLine, [
+      { key: Tree.TOP_OPEN, kind: "open" },
+      { key: Tree.TOP_CLOSE, kind: "close" }
+    ])];
   }
 
-  private frameTree(message: string, ...trees: (keyof typeof Tree)[]) {
-    let result = '';
+  private frameTree(message: string, trees: { key: Tree, kind: "open" | "middle" | "close" }[]) {
+    let result = message;
     for (const tree of trees) {
-      if (tree.endsWith("OPEN")) result = Tree[tree] + message;
-      else if (tree.endsWith("CELL")) {
-        if (result.startsWith(Tree.MIDDLE_CELL)) result += Tree[tree];
-        else result = Tree[tree] + message;
-      }
-      else result += Tree[tree];
+      if (tree.kind === "open") result = tree.key + result;
+      else result += tree.key;
     }
 
     return result;
@@ -52,14 +51,21 @@ export class ModalBuilder {
       : content + ' '.repeat(process.stdout.columns-this.getTextLength(content)-2)
     ;
 
-    this.texture.push(this.frameTree(writeMessage, "MIDDLE_CELL", "MIDDLE_CELL"));
+    this.texture.push(this.frameTree(writeMessage, [
+      { key: Tree.MIDDLE_CELL, kind: "open" },
+      { key: Tree.MIDDLE_CELL, kind: "close" }
+    ]));
     return writeMessage;
   }
 
-  private closeModal() {
+  private closeModal(shaders: Record<string, TextStyle[]>) {
     if (this.close) return false;
     this.close = true;
-    this.texture.push(this.frameTree(this.rowLine, "BOTTOM_OPEN", "BOTTOM_CLOSE"));
+    this.texture.unshift('     ' + Object.entries(shaders).map(([k, v]) => this.firstWordUnderscore(putStyle(k, ...v))).join('     '));
+    this.texture.push(this.frameTree(this.rowLine, [
+      { key: Tree.BOTTOM_OPEN, kind: "open" },
+      { key: Tree.BOTTOM_CLOSE, kind: "close" }
+    ]));
     return true;
   }
 
@@ -68,7 +74,9 @@ export class ModalBuilder {
     this.writeRow = result?.length ?? 0;
     while (this.writeRow <= this.message.length) this.writeRow += this.writeText()?.length ?? 0;
 
-    this.closeModal();
+    this.closeModal({
+      "Quit": [TextStyle.F_RED]
+    });
   }
 
   private getTextLength(message: string) {
@@ -79,5 +87,14 @@ export class ModalBuilder {
     }
 
     return length;
+  }
+
+  private firstWordUnderscore(message: string) {
+    const clear = clearStyle(message);
+    const content = clear ? clear.message : message;
+    const styles = clear?.styles ?? [];
+    styles.push(TextStyle.UNDERSCORE);
+
+    return putStyle(content[0].toUpperCase(), ...styles) + putStyle(content.slice(1).toLowerCase(), ...styles.slice(0, -1));
   }
 }

@@ -8,12 +8,29 @@
 
 import { TextStyle } from "../enums";
 
+export const REGEXP_ANSI = /(\x1b\[([\d;]+)m)(.+|)(\x1b\[0m)/;
+
 /**
  * Enclose it in ascii code.
  * 
  * @param value Value.
  * @param styles Ansi codes. It is convenient to use TextStyle.
  */
-export const Frame = (value: string, ...styles: TextStyle[]) => {
+export const putStyle = (value: string, ...styles: TextStyle[]) => {
   return `\x1b[${styles.join(';')}m${value}\x1b[0m`;
+}
+
+/**
+ * Clear ascii code.
+ * 
+ * @param value Value.
+ */
+export const clearStyle = (value: string) => {
+  if (!REGEXP_ANSI.test(value)) return null;
+
+  const exec = REGEXP_ANSI.exec(value)!;
+  return {
+    styles: exec[2].split(';').map<TextStyle>(Number),
+    message: exec[3]
+  };
 }

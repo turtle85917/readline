@@ -3,16 +3,16 @@
 // This game is "sokoban".
 // 👉 https://en.wikipedia.org/wiki/Sokoban
 
-import Readline, { TextStyle, Frame } from "../lib";
+import Readline, { TextStyle, putStyle } from "../lib";
 
 const WIDTH = 10;
 const HEIGHT = 6;
 const block = "██";
 
-let player = { block: Frame(block, TextStyle.F_YELLOW), x: 1, y: 1 };
+let player = { block: putStyle(block, TextStyle.F_YELLOW), x: 1, y: 1 };
 let status: Status = {
-  block: Frame(block, TextStyle.F_MAGENTA),
-  goal: (g) => Frame(block, g ? TextStyle.F_GREEN : TextStyle.F_RED),
+  block: putStyle(block, TextStyle.F_MAGENTA),
+  goal: (g) => putStyle(block, g ? TextStyle.F_GREEN : TextStyle.F_RED),
   blocks: [{ x: 4, y: 2 }, { x: 7, y: 3 }, { x: 2, y: 1 }],
   goals: [{ x: 2, y: 5, g: false }, { x: 8, y: 1, g: false }, { x: 4, y: 3, g: false }]
 }

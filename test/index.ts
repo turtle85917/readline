@@ -1,4 +1,4 @@
-import Readline, { PromptBuilder, TextStyle, Frame } from "../lib";
+import Readline, { PromptBuilder, TextStyle, putStyle } from "../lib";
 
 let money = 3500;
 let inventory: Inventory[] = [];
@@ -56,24 +56,24 @@ readline.addInputListener((data) => {
         .filter(item => shopItems.filter(sitem => sitem.value === item).length)
         .map(item => shopItems.find(sitem => sitem.value === item)!.price)
         .reduce((prev, curr) => prev + curr, 0);
-      if (money < price) process.stdout.write(`You don't have enough money...\n→ ${price} - ${Frame(`your: ${money}`, TextStyle.F_MAGENTA)} = ${Frame(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
+      if (money < price) process.stdout.write(`You don't have enough money...\n→ ${price} - ${putStyle(`your: ${money}`, TextStyle.F_MAGENTA)} = ${putStyle(`${(money-price).toLocaleString()}won`, TextStyle.F_RED)}`);
       else {
         money -= price;
-        const plusAnsi = Frame("+)", TextStyle.F_BLUE);
+        const plusAnsi = putStyle("+)", TextStyle.F_BLUE);
         shop.forEach((item: string) => {
           inventoryNewItem(item);
           console.log(`| ${plusAnsi} You got an ${item}! (Now you have ${inventoryFindItem(item)!.quantity}!)`);
         });
-        process.stdout.write(`└ ${plusAnsi} You have ${Frame(`${money}won`, TextStyle.BRIGHT)} left over from the buy. (${Frame(`-${price}won`, TextStyle.F_RED)})`);
+        process.stdout.write(`└ ${plusAnsi} You have ${putStyle(`${money}won`, TextStyle.BRIGHT)} left over from the buy. (${putStyle(`-${price}won`, TextStyle.F_RED)})`);
       }
     });
   }
   if (data === "inventory") {
-    process.stdout.write(Frame("In your current bag...", TextStyle.DIM));
-    console.log(`\n${Frame("*)", TextStyle.F_CYAN)} 💰 ${money.toLocaleString()}won.`);
+    process.stdout.write(putStyle("In your current bag...", TextStyle.DIM));
+    console.log(`\n${putStyle("*)", TextStyle.F_CYAN)} 💰 ${money.toLocaleString()}won.`);
     inventory.forEach(item => {
       const currentItem = findItem(item.staticId)!;
-      console.log(`${Frame("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
+      console.log(`${putStyle("*)", TextStyle.F_CYAN)} ${currentItem.icon} ${currentItem.name} × ${item.quantity.toLocaleString()}`);
     });
   }
 });

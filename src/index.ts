@@ -76,6 +76,7 @@ export default class Readline {
    * @param prompt prompt array.
    */
   async processPrompts<T extends string, U extends Record<T, any>>(promptObjects: PromptBuilder<T>[], callback: (response: U, objects: prompts.PromptObject<T>) => void|Promise<void>) {
+    // BUG Normal behavior after prompt handling. Abnormal before that. 
     this.rline.close();
     this.processing = true;
     this.clearScreen();

@@ -5,6 +5,8 @@
 </p>
 
 > Umm... In fact, this module is a project started to make the author comfortable when making games.
+> 
+> Since I am Korean, I use a translator quite a lot. You may see sloppy English grammar.
 
 # Examples
 ```js

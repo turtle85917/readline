@@ -11,4 +11,5 @@ export declare class ModalBuilder {
     private closeModal;
     private render;
     private getTextLength;
+    private firstWordUnderscore;
 }
