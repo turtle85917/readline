@@ -14,6 +14,7 @@ export default class Readline {
     private keypressDisable;
     private onlyDirectionKeys;
     private ASDWIsDirectionKeys;
+    private anyKeyPressed;
     /**
      * Initialization.
      */
@@ -79,6 +80,12 @@ export default class Readline {
      */
     setASDWIsDirectionKeys(value: boolean): void;
     /**
+     * Receive an event when any key is pressed
+     *
+     * @param value Value.
+     */
+    setAnyKeyPressed(value: boolean): void;
+    /**
      * Covers the newly printed message over the previously printed message.
      *
      * @param message Value.
@@ -96,7 +103,12 @@ export default class Readline {
      * @param value Value. Default value is `true`.
      */
     setCursorShow(value?: boolean): void;
-    private clearScreen;
+    /**
+     * Scroll down.
+     *
+     * @param value Don't ignore. Default value is `true`
+     */
+    clearScreen(value?: boolean): void;
     private newReadline;
     private eventInitial;
     private eventProcessing;
