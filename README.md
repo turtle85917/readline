@@ -15,10 +15,10 @@ import FunnyTerminal, { PromptBuilder } from "funny-terminal";
 const readline = new FunnyTerminal();
 readline.processPrompts<"anything", { anything: string; }>([
   new PromptBuilder()
-    .setType("text")
+    .setType("text") // Type
     .setName("anything") // Use the same as the generic name
-    .setMessage("Write anything")
-    .setInitial("I hate this module.")
+    .setMessage("Write anything") // Question
+    .setInitial("I hate this module.") // Placeholder
 ], (value) => {
   if (value.anything === undefined) return;
   console.log(value.anything);

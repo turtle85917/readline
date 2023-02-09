@@ -26,6 +26,7 @@ export default class Readline {
   private keypressDisable: boolean;
   private onlyDirectionKeys: boolean;
   private ASDWIsDirectionKeys: boolean;
+  private anyKeyPressed: boolean;
 
   /**
    * Initialization.
@@ -36,12 +37,13 @@ export default class Readline {
     });
     this.coverMessageLength = 0;
     this.listeners = { input: undefined, action: undefined };
-    
+
     this.autoFoucs = true;
     this.processing = false;
     this.keypressDisable = false;
     this.onlyDirectionKeys = false;
     this.ASDWIsDirectionKeys = false;
+    this.anyKeyPressed = false;
 
     readline.emitKeypressEvents(process.stdin, this.rline);
     if (process.stdin.isTTY) process.stdin.setRawMode(true);
@@ -62,12 +64,16 @@ export default class Readline {
       if (key.name === "abort") process.exit();
       if (DIRECTION_KEYS.some(k => key.name === k) || (this.ASDWIsDirectionKeys && Object.keys(ASDW_KEYS).some(k => key.name === k))) action = ASDW_KEYS[key.name as ASDW] ?? key.name
 
-      if (action !== '') this.rline.emit("action", { name: action, key } as ActionData);
+      if (action !== '' || this.anyKeyPressed) this.rline.emit("action", { name: action || "any", key } as ActionData);
     });
     process.on("SIGINT", process.exit);
     process.on("SIGQUIT", process.exit);
     process.on("SIGBREAK", process.exit);
     process.stdin.on("end", process.exit);
+    process.on("exit", () => {
+      this.setCursorShow();
+      readline.cursorTo(process.stdout, 0, this.coverMessageLength+1);
+    });
   }
 
   /**
@@ -197,6 +203,15 @@ export default class Readline {
   }
 
   /**
+   * Receive an event when any key is pressed
+   * 
+   * @param value Value.
+   */
+  setAnyKeyPressed(value: boolean) {
+    this.anyKeyPressed = value;
+  }
+
+  /**
    * Covers the newly printed message over the previously printed message.
    * 
    * @param message Value.
@@ -227,7 +242,12 @@ export default class Readline {
     process.stderr.write(`\u001B[?25${value ? 'h' : 'l'}`);
   }
 
-  private clearScreen(value: boolean = true) {
+  /**
+   * Scroll down.
+   * 
+   * @param value Don't ignore. Default value is `true`
+   */
+  clearScreen(value: boolean = true) {
     if (value !== undefined && !value) return;
     console.log('\n'.repeat(Math.max(process.stdout.rows-2, 0)));
     readline.cursorTo(process.stdout, 0, 0);
