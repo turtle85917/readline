@@ -72,7 +72,7 @@ export default class Readline {
     process.stdin.on("end", process.exit);
     process.on("exit", () => {
       this.setCursorShow();
-      readline.cursorTo(process.stdout, 0, this.coverMessageLength+1);
+      if (this.coverMessageLength > 0) readline.cursorTo(process.stdout, 0, this.coverMessageLength+1);
     });
   }
 

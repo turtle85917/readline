@@ -6,8 +6,6 @@
 * Licensed under MIT License. Please see more defails in LICENSE file.
 */
 
-import { TextStyle } from "../enums";
-
 export const REGEXP_ANSI = /(\x1b\[([\d;]+)m)(.+|)(\x1b\[0m)/;
 
 /**
@@ -16,7 +14,7 @@ export const REGEXP_ANSI = /(\x1b\[([\d;]+)m)(.+|)(\x1b\[0m)/;
  * @param value Value.
  * @param styles Ansi codes. It is convenient to use TextStyle.
  */
-export const putStyle = (value: string, ...styles: TextStyle[]) => {
+export const putStyle = (value: string, ...styles: number[]) => {
   return `\x1b[${styles.join(';')}m${value}\x1b[0m`;
 }
 
@@ -30,7 +28,7 @@ export const clearStyle = (value: string) => {
 
   const exec = REGEXP_ANSI.exec(value)!;
   return {
-    styles: exec[2].split(';').map<TextStyle>(Number),
+    styles: exec[2].split(';').map<number>(Number),
     message: exec[3]
   };
 }
